@@ -3,9 +3,11 @@ const authRouter = express.Router();
 const session = require('express-session');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const bcrypt = require('bcryptjs');
 const store = new session.MemoryStore();
 const {pool} = require('../model/database');
+const crypto = require('crypto-js');
 
 passport.use(new LocalStrategy(async function verify(username, password, done) {
     try {
@@ -22,6 +24,41 @@ passport.use(new LocalStrategy(async function verify(username, password, done) {
         }
         return done(null, user);
     } catch(err) {
+        return done(err);
+    }
+}));
+
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: process.env.GOOGLE_CALLBACK_URL
+}, async (accessToken, refreshToken, profile, done) => {
+    try {
+        // Attempt to find the user in the database
+        const existingUserQuery = 'SELECT * FROM users WHERE google_id = $1';
+        const existingUserResult = await pool.query(existingUserQuery, [profile.id]);
+
+        if (existingUserResult.rows.length > 0) {
+            // User found, return existing user
+            return done(null, existingUserResult.rows[0]);
+        } else {
+            // No user found, create a new user in the database
+
+            const placeholderPassword = crypto.lib.WordArray.random(128 / 8).toString();
+            const newUserQuery = 'INSERT INTO users (name, email, username, google_id, password) VALUES ($1, $2, $3, $4, $5) RETURNING *';
+            const newUserValues = [
+                profile.displayName, 
+                profile.emails[0].value, 
+                profile.emails[0].value.split('@')[0], 
+                profile.id,
+                placeholderPassword
+            ];
+
+            const newUserResult = await pool.query(newUserQuery, newUserValues);
+            return done(null, newUserResult.rows[0]);
+        }
+    } catch (err) {
+        console.error("Error during Google authentication:", err);
         return done(err);
     }
 }));
@@ -43,12 +80,6 @@ passport.deserializeUser(async (id, done) => {
         done(err);
     }
 });
-
-async function registerUser({username, password, name, email, address}) {
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-    await pool.query('INSERT INTO users (name, email, username, address, password) VALUES ($1, $2, $3, $4, $5)', [name, email, username, address, hashedPassword]);
-};
 
 authRouter.post('/register', async (req, res, next) => {
     try {
@@ -97,20 +128,59 @@ authRouter.post('/login', (req, res, next) => {
     })(req, res, next);
 });
 
-authRouter.get("/login/success", (req, res) => {
+authRouter.get("/is_logged_in", async (req, res) => {
     if (req.isAuthenticated()) {
-        res.status(200).json({ message: "Login route accessed successfully" });
+        try {
+            const { id } = req.user;
+            const user = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
+            if (!user) {
+                throw createError(404, 'User record not found');
+            }
+
+            if (user.rows.length === 0) {
+                return res.status(404).json({ message: 'User record not found' });
+            }
+
+            const userData = { ...user.rows[0] };
+            delete userData.password; // Remove sensitive data
+
+            res.status(200).json({
+                user: userData,
+                message: "Login route accessed successfully"
+            });
+        } catch (err) {
+            res.status(500).json({ message: "Internal server error" });
+        }
     } else {
         res.status(401).json({ message: "Unauthorized" });
     }
 });
 
+authRouter.get('/google', passport.authenticate('google', 
+    { scope: ['profile', 'email'] }));
+    
+
+authRouter.get('/google/callback', 
+    passport.authenticate('google', { 
+        failureRedirect: '/login',
+        failureMessage: "Failed to authenticate. Try again.",
+    }), (req, res) => {
+        console.log('Google login successful, user:', req.user);
+        res.redirect('/');
+    }
+);
+
 const initAuth = (app) => {
+    app.set('trust proxy', 1);
     app.use(session({
         secret: 'nfdjgf_74bB7v',
         resave: false,
         saveUninitialized: false,
-        cookie: { secure: false, httpOnly: false, maxAge: 3600000 },
+        cookie: { 
+            secure: app.get('env') === 'production',
+            httpOnly: true, 
+            maxAge: 3600000 
+        },
         store: store
     }));
     app.use(passport.initialize());

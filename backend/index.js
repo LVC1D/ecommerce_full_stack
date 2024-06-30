@@ -1,6 +1,8 @@
 const express = require('express');
 const app = express();
 const port = 3400;
+const https = require('https');
+const fs = require('fs');
 const path = require('path');
 const helmet = require('helmet');
 const bodyParser = require('body-parser');
@@ -15,10 +17,14 @@ const {authRouter, initAuth} = require('./apiRoutes/auth');
 const productRouter = require('./apiRoutes/products')(pool);
 const orderRouter = require('./apiRoutes/orders')(pool, ensureAuthenticated);
 
-initAuth(app);
+const sslOptions = {
+    key: fs.readFileSync(path.join(__dirname, 'certs', 'myapp.local-key.pem')),
+    cert: fs.readFileSync(path.join(__dirname, 'certs', 'myapp.local.pem'))
+};
 
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: 'https://localhost:5173',
+    credentials: true
 }));
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -26,9 +32,13 @@ app.use(express.json());
 app.use(partials());
 
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
-app.use(morgan("tiny"));
+app.use(morgan("dev"));
 app.use(helmet());
 app.use(flash());
+
+// initialized AFTER the body-parsing, cors-ing and json-ifying middleware
+initAuth(app);
+
 app.use('/api/auth', authRouter);
 app.use('/products', productRouter);
 app.use('/orders', orderRouter);
@@ -42,6 +52,6 @@ app.use((err, req, res, next) => {
     res.status(500).json({ message: "Internal Server Error" });
 });
 
-app.listen(port, () => {
-    console.log("Server started at port " + port)
+https.createServer(sslOptions, app).listen(port, () => {
+    console.log(`Server started at https://localhost:${port}`);
 });

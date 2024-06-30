@@ -20,9 +20,9 @@ export const registerUser = createAsyncThunk(
         name,
         address,
       });
-      return response.data; // Assuming the server responds with the newly registered user
+      return response.data;
     } catch (error) {
-      throw error.response.data; // Throw error for Redux Toolkit to handle
+      throw error.response.data;
     }
   }
 );
@@ -39,24 +39,9 @@ export const loginUser = createAsyncThunk(
       return {
         user: data.user,
         isAuth: true,
-      }; // Assuming the server responds with the logged-in user
+      };
     } catch (error) {
-      throw error.response.data; // Throw error for Redux Toolkit to handle
-    }
-  }
-);
-
-export const loginWithGoogle = createAsyncThunk(
-  'auth/googleLogin',
-  async () => {
-    try {
-      const { data } = await api.post('/api/auth/is_logged_in');
-      return {
-        user: data.user,
-        isAuth: true,
-      }; // Assuming the server responds with the logged-in user's data
-    } catch (error) {
-      throw error.response.data; // Throw error for Redux Toolkit to handle
+      throw error.response.data;
     }
   }
 );
@@ -65,13 +50,16 @@ export const checkLoginStatus = createAsyncThunk(
   'auth/checkStatus',
   async () => {
     try {
-      const { data } = await api.get('/api/auth/is_logged_in');
+      const response = await api.get('/api/auth/is_logged_in', {withCredentials: true});
       return {
-        user: data.user,
+        user: response.data.user,
         isAuth: true,
       };
     } catch (error) {
-      throw error.response.data;
+      return {
+        user: null,
+        isAuth: false,
+      };
     }
   }
 );
@@ -129,23 +117,12 @@ const authSlice = createSlice({
       .addCase(checkLoginStatus.fulfilled, (state, action) => {
         state.status = 'succeeded';
         state.user = action.payload.user;
-        state.isAuth = true;
+        state.isAuth = action.payload.isAuth;
       })
       .addCase(checkLoginStatus.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.payload;
-      })
-      .addCase(loginWithGoogle.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(loginWithGoogle.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        state.user = action.payload.user;
-        state.isAuth = true;
-      })
-      .addCase(loginWithGoogle.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.payload;
+        state.error = action.error.message;
+        state.isAuth = false;
       });
   },
 });

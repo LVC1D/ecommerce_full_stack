@@ -19,7 +19,7 @@ function Header() {
 
     return (
         <div>
-            {isAuth && user ? (
+            {user ? (
                 <div>
                     <h2>Welcome, {user?.name}</h2>
                     <button onClick={handleLogout}>Logout</button>

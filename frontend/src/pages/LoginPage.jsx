@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { loginUser, checkLoginStatus, loginWithGoogle } from '../features/authSlice';
+import { loginUser } from '../features/authSlice';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import ROUTES from '../routes';
 import {useNavigate} from 'react-router-dom';
@@ -23,16 +23,15 @@ const LoginPage = () => {
 
   const handleLogin = (values) => {
     dispatch(loginUser(values));
-    // navigate(ROUTES.HOME);
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = `http://localhost:3400/api/auth/google`;
+    window.location.href = `https://localhost:5173/api/auth/google`;
   };
 
-  useEffect(() => {
-    dispatch(checkLoginStatus());
-  }, [dispatch]);
+  const handleFacebookLogin = () => {
+    window.location.href = `https://localhost:5173/api/auth/facebook`;
+  };
 
   useEffect(() => {
     if (isAuth) {
@@ -67,6 +66,9 @@ const LoginPage = () => {
             <h2>Or login via SSO</h2>
             <button type="submit" onClick={handleGoogleLogin}>
               Google
+            </button>
+            <button type="submit" onClick={handleFacebookLogin}>
+              Facebook
             </button>
             {status === 'loading' && <p>Loading...</p>}
             {error && <p>{error}</p>}

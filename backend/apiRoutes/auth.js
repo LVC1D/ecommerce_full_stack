@@ -4,7 +4,9 @@ const session = require('express-session');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const FacebookStrategy = require('passport-facebook').Strategy;
 const bcrypt = require('bcryptjs');
+require('dotenv').config();
 const store = new session.MemoryStore();
 const {pool} = require('../model/database');
 const crypto = require('crypto-js');
@@ -61,6 +63,51 @@ passport.use(new GoogleStrategy({
         console.error("Error during Google authentication:", err);
         return done(err);
     }
+}));
+
+passport.use(new FacebookStrategy({
+    clientID: process.env.FACEBOOK_CLIENT_ID,
+    clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+    callbackURL: process.env.FACEBOOK_CLIENT_CALLBACK,
+    profileFields: ['id', 'displayName', 'emails']
+}, async (accessToken, refreshToken, profile, done) => {
+    try {
+        // Attempt to find the user in the database
+        const existingUserQuery = 'SELECT * FROM users WHERE facebook_id = $1';
+        const existingUserResult = await pool.query(existingUserQuery, [profile.id]);
+
+        if (existingUserResult.rows.length > 0) {
+            // User found, return existing user
+            return done(null, existingUserResult.rows[0]);
+        } else {
+            // No user found, create a new user in the database
+
+            const email = profile.emails && profile.emails.length > 0 ? profile.emails[0].value : null;
+            if (!email) {
+                // Handle the case where email is not available
+                console.error("Email is required but was not provided by Facebook");
+                return done(new Error("Email is required but was not provided by Facebook"));
+            }
+
+            const fallbackUsername = email.split('@')[0];
+
+            const placeholderPassword = crypto.lib.WordArray.random(128 / 8).toString();
+            const newUserQuery = 'INSERT INTO users (name, email, username, facebook_id, password) VALUES ($1, $2, $3, $4, $5) RETURNING *';
+            const newUserValues = [
+                profile.displayName || 'Unknown', // Fallback for displayName
+                email, // Use the safely extracted email
+                fallbackUsername, // Fallback to local-part of email if username is not available
+                profile.id,
+                placeholderPassword
+            ];
+
+            const newUserResult = await pool.query(newUserQuery, newUserValues);
+            return done(null, newUserResult.rows[0]);
+        }
+    } catch (err) {
+        console.error("Error during Facebook authentication:", err);
+        return done(err);
+    } 
 }));
 
 passport.serializeUser((user, done) => {
@@ -128,31 +175,11 @@ authRouter.post('/login', (req, res, next) => {
     })(req, res, next);
 });
 
-authRouter.get("/is_logged_in", async (req, res) => {
+authRouter.get('/is_logged_in', (req, res) => {
     if (req.isAuthenticated()) {
-        try {
-            const { id } = req.user;
-            const user = await pool.query('SELECT * FROM users WHERE id = $1', [id]);
-            if (!user) {
-                throw createError(404, 'User record not found');
-            }
-
-            if (user.rows.length === 0) {
-                return res.status(404).json({ message: 'User record not found' });
-            }
-
-            const userData = { ...user.rows[0] };
-            delete userData.password; // Remove sensitive data
-
-            res.status(200).json({
-                user: userData,
-                message: "Login route accessed successfully"
-            });
-        } catch (err) {
-            res.status(500).json({ message: "Internal server error" });
-        }
+        return res.json({ user: req.user });
     } else {
-        res.status(401).json({ message: "Unauthorized" });
+        return res.status(401).json({ error: 'Not authenticated' });
     }
 });
 
@@ -170,16 +197,29 @@ authRouter.get('/google/callback',
     }
 );
 
+authRouter.get('/facebook', passport.authenticate('facebook', { scope: ['email', 'public_profile'] }));
+
+authRouter.get('/facebook/callback', 
+    passport.authenticate('facebook', { 
+        failureRedirect: '/login',
+        failureMessage: "Failed to authenticate. Try again.",
+    }), (req, res) => {
+        console.log('Facebook login successful, user:', req.user);
+        res.redirect('/');
+    }
+);
+
 const initAuth = (app) => {
     app.set('trust proxy', 1);
     app.use(session({
-        secret: 'nfdjgf_74bB7v',
+        secret: process.env.CLIENT_SECRET,
         resave: false,
         saveUninitialized: false,
         cookie: { 
-            secure: app.get('env') === 'production',
+            secure: true,
             httpOnly: true, 
-            maxAge: 3600000 
+            maxAge: 360000000,
+            sameSite: 'none'
         },
         store: store
     }));

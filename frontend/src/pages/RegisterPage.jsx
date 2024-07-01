@@ -31,11 +31,6 @@ const RegisterPage = () => {
     navigate(ROUTES.LOGIN);
   };
 
-//   const handleLogin = (values) => {
-//     const { username, password } = values;
-//     dispatch(loginUser({ username, password }));
-//   };
-
   return (
     <Formik
       initialValues={initialValues}

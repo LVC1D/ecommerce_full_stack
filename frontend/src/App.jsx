@@ -5,12 +5,14 @@ import Root from './components/Root';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import Products from './components/Products';
+import Product from './components/Product';
 import ROUTES from './routes';
 import './App.css'
 
 const router = createBrowserRouter(createRoutesFromElements(
   <Route path={ROUTES.HOME} element={<Root/>}>
     <Route index element={<Products/>}/>
+    <Route path={ROUTES.PRODUCT(':id')} element={<Product/>}/>
     <Route path={ROUTES.LOGIN} element={<LoginPage/>}/>
     <Route path={ROUTES.REGISTER} element={<RegisterPage/>}/>
   </Route>

@@ -2,9 +2,9 @@ const ROUTES = {
     HOME: '/',
     LOGIN: '/api/auth/login',
     REGISTER: '/api/auth/register',
-    PRODUCT: (id) => `/products/${id}`,
-    ORDER: (userId, orderId) => `/users/${userId}/orders/${orderId}`,
-    ORDERS: (id) => `/users/${id}/orders`,
+    PRODUCT: (productId) => `/products/${productId}`,
+    ORDER: (orderId) => `/orders/${orderId}`,
+    ORDERS: `/orders`,
     PROFILE: (id) => `/users/${id}`,
     NOT_FOUND: '/404',
 };

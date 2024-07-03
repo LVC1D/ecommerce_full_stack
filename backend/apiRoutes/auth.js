@@ -218,7 +218,7 @@ const initAuth = (app) => {
         cookie: { 
             secure: true,
             httpOnly: true, 
-            maxAge: 360000000,
+            maxAge: 8640000000,
             sameSite: 'none'
         },
         store: store

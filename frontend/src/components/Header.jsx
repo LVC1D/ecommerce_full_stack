@@ -19,9 +19,15 @@ function Header() {
 
     return (
         <div>
+            <button>
+                <Link to={ROUTES.HOME}>To home</Link>
+            </button>
             {user ? (
                 <div>
                     <h2>Welcome, {user?.name}</h2>
+                    <button>
+                        <Link to={ROUTES.ORDERS}>My orders</Link>
+                    </button>
                     <button onClick={handleLogout}>Logout</button>
                 </div>
             ) : (

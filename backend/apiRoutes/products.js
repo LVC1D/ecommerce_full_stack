@@ -22,7 +22,7 @@ module.exports = (pool)  => {
             } else if (!result.rows[0]) {
                 res.status(404).json({ message: "Product not found" });
             } else {
-                res.status(200).json(result.rows);
+                res.status(200).json(result.rows[0]);
             }
         });
     });

@@ -1,6 +1,5 @@
-import PropTypes from "prop-types";
-
 function Product({product}) {
+    
     console.log(product);
     if (!product) {
         // Render a loading indicator or return null
@@ -15,16 +14,6 @@ function Product({product}) {
             <p>Available in stock: {product.quantity}</p>
         </div>
     )
-}
-
-Product.propTypes = {
-    product: PropTypes.shape({
-        id: PropTypes.number,
-        name: PropTypes.string,
-        category: PropTypes.string,
-        price: PropTypes.number,
-        quantity: PropTypes.number
-    })
 }
 
 export default Product;

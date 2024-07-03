@@ -3,8 +3,14 @@ const orderRouter = express.Router();
 
 module.exports = (pool, ensureAuthenticated) => {
 
-    orderRouter.get('/', ensureAuthenticated, (req, res) => {
-        pool.query('SELECT * FROM orders', (err, result) => {
+    orderRouter.get('/', ensureAuthenticated, async (req, res) => {
+        const userId = parseInt(req.query.userId);
+        if (isNaN(userId)) {
+            res.status(400).json({ message: "Invalid user ID" });
+            return;
+        }
+
+        await pool.query('SELECT * FROM orders WHERE user_id = $1', [userId], (err, result) => {
             if (err) {
                 console.error("Error getting orders:", err);
                 res.status(500).json({ message: err.message });
@@ -16,7 +22,8 @@ module.exports = (pool, ensureAuthenticated) => {
     
     orderRouter.get('/:id', ensureAuthenticated, async (req, res) => {
         const orderId = parseInt(req.params.id);
-        await pool.query('SELECT * FROM orders WHERE id = $1', [orderId], (err, result) => {
+        const userId = parseInt(req.query.userId);
+        await pool.query('SELECT * FROM orders WHERE id = $1 AND user_id = $2', [orderId, userId], (err, result) => {
             if (err) {
                 console.error("Error getting order:", err);
                 res.status(500).json({ message: err.message });
@@ -27,8 +34,6 @@ module.exports = (pool, ensureAuthenticated) => {
             }
         });
     });
-    
-    // todo the Post route
 
     return orderRouter;
 }

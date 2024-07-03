@@ -16,6 +16,7 @@ const {pool} = require('./model/database');
 const {authRouter, initAuth} = require('./apiRoutes/auth');
 const productRouter = require('./apiRoutes/products')(pool);
 const orderRouter = require('./apiRoutes/orders')(pool, ensureAuthenticated);
+const userRouter = require('./apiRoutes/users')(pool, ensureAuthenticated);
 
 const sslOptions = {
     key: fs.readFileSync(path.join(__dirname, 'certs', 'myapp.local-key.pem')),
@@ -42,6 +43,7 @@ initAuth(app);
 app.use('/api/auth', authRouter);
 app.use('/products', productRouter);
 app.use('/orders', orderRouter);
+app.use('/users', userRouter);
 
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'frontend', 'index.html'));

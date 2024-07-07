@@ -3,29 +3,39 @@ const cartRouter = express.Router();
 
 module.exports = (pool, ensureAuthenticated, calculateSubtotal, incrementItemCount) => {
     
-        cartRouter.get('/:id', ensureAuthenticated, async (req, res) => {
-            const cartId = parseInt(req.params.id);
-            const userId = parseInt(req.query.userId);
-            await pool.query('SELECT * FROM cart WHERE id = $1 AND user_id = $2', [cartId, userId], (err, result) => {
+        cartRouter.get('/', ensureAuthenticated, async (req, res) => {
+            const userId = parseInt(req.query.userId, 10);
+
+            if (isNaN(userId)) {
+                return res.status(400).json({ message: "Invalid userId" });
+            }
+            
+            await pool.query('SELECT * FROM cart WHERE user_id = $1', [userId], (err, result) => {
                 if (err) {
                     console.error("Error getting cart:", err);
                     res.status(500).json({ message: err.message });
                 } else if (!result.rows[0]) {
                     res.status(404).json({ message: "Cart not found" });
                 } else {
-                    // calculateSubtotal(cartId, pool);
                     res.status(200).json(result.rows[0]);
                 }
             });
         });
 
         cartRouter.post('/', ensureAuthenticated, async (req, res) => {
-            const userId = req.query.userId
+            const userId = parseInt(req.query.userId, 10);
+
+            if (isNaN(userId)) {
+                return res.status(400).json({ message: "Invalid userId" });
+            }
+
             const cartId = await pool.query('SELECT id FROM cart WHERE user_id = $1', [userId]);
+
             if (cartId.rows[0]) {
                 res.status(400).json({ message: "Cart already exists" });
                 return;
             }
+
             await pool.query('INSERT INTO cart (user_id) VALUES ($1) RETURNING *', [userId], (err, result) => {
                 if (err) {
                     console.error("Error creating cart:", err);
@@ -38,7 +48,7 @@ module.exports = (pool, ensureAuthenticated, calculateSubtotal, incrementItemCou
 
         // to create a POST route for /cart/:id
         cartRouter.post('/:id', ensureAuthenticated, async (req, res) => {
-            const cartId = parseInt(req.params.id);
+            const cartId = req.params.id;
             const { productId } = req.body;
     
             if (!cartId) {

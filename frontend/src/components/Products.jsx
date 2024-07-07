@@ -1,19 +1,34 @@
 import { useEffect } from "react";
 import {useDispatch, useSelector} from "react-redux";
-import { fetchProducts, selectProducts, selectIsLoading, selectError } from "../features/productSlice";
+import { fetchProducts, selectProducts, selectError } from "../features/productSlice";
+import { addToCart, fetchCartByIds } from "../features/cartSlice";
 import { Link } from "react-router-dom";
 import ROUTES from "../routes";
 
 function Products() {
   const products = useSelector(selectProducts);
-  const isLoading = useSelector(selectIsLoading);
+  // const isLoading = useSelector(selectIsLoading);
   const isError = useSelector(selectError);
   const dispatch = useDispatch();
+  const {cart} = useSelector((state) => state.cart);
+  const {user, isAuth} = useSelector((state) => state.auth);
 
   useEffect(() => {
     dispatch(fetchProducts())
   }, [dispatch]);
 
+  const handleAddToCart = async (productId) => {
+    if (user && isAuth && cart) {
+        try {
+            await dispatch(addToCart({ cartId: cart.id, productId })).unwrap();
+            // Re-fetch the cart to get the updated item_count
+            await dispatch(fetchCartByIds(user.id)).unwrap();
+          } catch (error) {
+              console.error("Failed to add to cart:", error);
+          }
+      }
+  };  
+  
   return (
     <div>
       <h1>Super Awesome eCommerce site!</h1>
@@ -27,7 +42,7 @@ function Products() {
                 <p>${product.price}</p>
                 <p>Available in stock: {product.quantity}</p>
               </Link>
-              <button>Add to Cart</button>
+              {cart ? <button onClick={() => handleAddToCart(product.id)}>Add to Cart</button> : <button>Add to Cart</button>}
           </li>
         ))}
       </ul>

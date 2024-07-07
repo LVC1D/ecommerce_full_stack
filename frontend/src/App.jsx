@@ -7,6 +7,7 @@ import RegisterPage from './pages/RegisterPage';
 import Products from './components/Products';
 import ProductDetails from './pages/ProductDetails';
 import Orders from './pages/Orders';
+import UserProfile from './pages/UserProfile';
 import ROUTES from './routes';
 import './App.css'
 
@@ -17,6 +18,7 @@ const router = createBrowserRouter(createRoutesFromElements(
     <Route path={ROUTES.LOGIN} element={<LoginPage/>}/>
     <Route path={ROUTES.REGISTER} element={<RegisterPage/>}/>
     <Route path={ROUTES.ORDERS} element={<Orders/>}/>
+    <Route path={ROUTES.PROFILE(':userId')} element={<UserProfile/>} />
   </Route>
 ))
 

@@ -35,7 +35,6 @@ function Products() {
   return (
     <div>
       <h1>Super Awesome eCommerce site!</h1>
-      <p>Feel free to browse around</p>
       <ul className="products-grid">
         {products && products.map(product => (
           <li key={product.id}>

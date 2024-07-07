@@ -33,6 +33,18 @@ export const fetchProductById = createAsyncThunk(
     }
 );
 
+export const fetchProductsBySearchTerm = createAsyncThunk(
+    'products/fetchProductsBySearchTerm',
+    async (searchTerm) => {
+        try {
+            const response = await api.get(`/products/search/${searchTerm}`);
+            return response.data;
+        } catch (error) {
+            throw error.response.data;
+        }
+    }
+)
+
 export const productSlice = createSlice({
     name: 'products',
     initialState,
@@ -60,6 +72,18 @@ export const productSlice = createSlice({
                 state.selectedProduct = action.payload;
             })
             .addCase(fetchProductById.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload;
+            })
+            .addCase(fetchProductsBySearchTerm.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(fetchProductsBySearchTerm.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.products = action.payload;
+            })
+            .addCase(fetchProductsBySearchTerm.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
             });

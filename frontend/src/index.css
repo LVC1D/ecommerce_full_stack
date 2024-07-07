@@ -1,3 +1,5 @@
+/* Whole thing */
+
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -11,6 +13,13 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
 }
 
 a {
@@ -54,6 +63,64 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+/* Header */
+
+.nav-bar {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 4.7rem;
+  z-index: 10;
+  position: fixed;
+  top: 0;
+  left: 0;
+  border-bottom: 1px solid rgba(129, 133, 137, 0.6);
+}
+
+.nav-bar-logged-in {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; 
+}
+
+/* main */
+
+.main {
+  position: relative;
+  top: 2.5rem;
+}
+
+/* Products */
+
+ul.products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 columns */
+  gap: 20px; /* Space between grid items */
+  list-style: none; /* Remove list style */
+  padding: 0; /* Remove default padding */
+  margin: 0; /* Remove default margin */
+}
+
+/* Individual product items */
+ul.products-grid li {
+  border: 1px solid #ccc; /* Tiny border around each item */
+  padding: 15px; /* Padding around each item */ 
+  border-radius: 5px; /* Optional: rounded corners */
+}
+
+/* Links inside the product items */
+ul.products-grid li a {
+  text-decoration: none; /* Remove link underline */
+  color: inherit; /* Inherit text color */
+}
+
+/* Product item hover effect */
+ul.products-grid li:hover {
+  border-color: #888; /* Darken the border on hover */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional: subtle shadow on hover */
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
@@ -64,5 +131,18 @@ button:focus-visible {
   }
   button {
     background-color: #f9f9f9;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color: #ffffff;
+    background-color: #213547;
+  }
+  a:hover {
+    color: #8e93ee;
+  }
+  button {
+    background-color: #1a1a1a;
   }
 }

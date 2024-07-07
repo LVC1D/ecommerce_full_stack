@@ -2,20 +2,23 @@ import { useEffect } from "react";
 import {useDispatch, useSelector} from "react-redux";
 import { fetchProducts, selectProducts, selectError } from "../features/productSlice";
 import { addToCart, fetchCartByIds } from "../features/cartSlice";
+import { selectSearchTerm } from "../features/searchSlice";
 import { Link } from "react-router-dom";
 import ROUTES from "../routes";
 
 function Products() {
   const products = useSelector(selectProducts);
   // const isLoading = useSelector(selectIsLoading);
+  // // const isLoading = useSelector(selectIsLoading);
   const isError = useSelector(selectError);
   const dispatch = useDispatch();
   const {cart} = useSelector((state) => state.cart);
   const {user, isAuth} = useSelector((state) => state.auth);
+  const searchTerm = useSelector(selectSearchTerm);
 
   useEffect(() => {
-    dispatch(fetchProducts())
-  }, [dispatch]);
+    if (!searchTerm) dispatch(fetchProducts())
+  }, [dispatch, searchTerm]);
 
   const handleAddToCart = async (productId) => {
     if (user && isAuth && cart) {
@@ -33,7 +36,7 @@ function Products() {
     <div>
       <h1>Super Awesome eCommerce site!</h1>
       <p>Feel free to browse around</p>
-      <ul>
+      <ul className="products-grid">
         {products && products.map(product => (
           <li key={product.id}>
               <Link to={ROUTES.PRODUCT(product.id)}>

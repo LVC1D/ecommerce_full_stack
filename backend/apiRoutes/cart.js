@@ -46,7 +46,6 @@ module.exports = (pool, ensureAuthenticated, calculateSubtotal, incrementItemCou
             });
         });
 
-        // to create a POST route for /cart/:id
         cartRouter.post('/:id', ensureAuthenticated, async (req, res) => {
             const cartId = req.params.id;
             const { productId } = req.body;
@@ -89,6 +88,8 @@ module.exports = (pool, ensureAuthenticated, calculateSubtotal, incrementItemCou
                 res.status(500).json({ message: err.message });
             }
         });
+
+        // to create a checkout router
     
         return cartRouter;
 }

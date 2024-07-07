@@ -35,13 +35,14 @@ function Header() {
     }, [dispatch]);
 
     return (
-        <div>
+        <div className='nav-bar'>
             <button>
                 <Link to={ROUTES.HOME}>To home</Link>
             </button>
+            <SearchBar />
             {user ? (
-                <div>
-                    <h2>Welcome, {user?.name}</h2>
+                <div className='nav-bar-logged-in'>
+                    <h2>Hi there, {user?.name}</h2>
                     <button>
                         <Link to={ROUTES.ORDERS}>My orders</Link>
                     </button>
@@ -60,7 +61,6 @@ function Header() {
                     </button>
                 </div>
             )}
-            <SearchBar />
         </div>
     );
 }

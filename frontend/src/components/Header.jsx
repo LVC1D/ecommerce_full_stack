@@ -15,19 +15,22 @@ function Header() {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        if (user && isAuth) {
-            const fetchOrCreateCart = async () => {
-                try {
-                    await dispatch(fetchCartByIds(user.id)).unwrap();
-                } catch (error) {
-                    if (error === 'Cart not found') {
+        const fetchOrCreateCart = async () => {
+            try {
+                if (user && isAuth) {
+                    if (!cart) {
                         await dispatch(createCart(user.id)).unwrap();
+                    } else if (!cart.items.length) {
+                        await dispatch(fetchCartByIds(user.id)).unwrap();
                     }
                 }
-            };
-            fetchOrCreateCart();
-        }
-    }, [dispatch, user, isAuth]);
+            } catch (error) {
+                console.error('Error fetching or creating cart:', error);
+            }
+        };
+
+        fetchOrCreateCart();
+    }, [dispatch, user, isAuth, cart]);
 
     const handleLogout = () => {
         dispatch(logoutUser());
@@ -57,7 +60,9 @@ function Header() {
                                     <Link to={ROUTES.ORDERS}>My orders</Link>
                                 </button>
                                 <button>
-                                    Cart ({cart?.item_count || 0})
+                                    <Link to={ROUTES.CART(cart?.id)}>
+                                        Cart ({cart?.item_count || 0})
+                                    </Link>
                                 </button>
                                 <button>
                                     <Link to={ROUTES.PROFILE(user?.id)}>My prodile</Link>

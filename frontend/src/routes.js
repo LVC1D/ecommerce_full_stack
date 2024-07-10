@@ -6,7 +6,7 @@ const ROUTES = {
     ORDER: (orderId) => `/orders/${orderId}`,
     ORDERS: `/orders`,
     PROFILE: (userId) => `/users/${userId}`,
-    CART: (cartId) => `/cart/${cartId}`,
+    CART: (cartId) => `/cart/${cartId}/items`,
     NOT_FOUND: '/404',
 };
 

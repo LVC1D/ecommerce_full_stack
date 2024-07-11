@@ -15,22 +15,12 @@ function Header() {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        const fetchOrCreateCart = async () => {
-            try {
-                if (user && isAuth) {
-                    if (!cart) {
-                        await dispatch(createCart(user.id)).unwrap();
-                    } else if (!cart.items.length) {
-                        await dispatch(fetchCartByIds(user.id)).unwrap();
-                    }
-                }
-            } catch (error) {
-                console.error('Error fetching or creating cart:', error);
-            }
-        };
+        dispatch(fetchCartByIds(user?.id));
+    }, [dispatch, user]);
 
-        fetchOrCreateCart();
-    }, [dispatch, user, isAuth, cart]);
+    useEffect(() => {
+        dispatch(createCart(user?.id));
+    }, [dispatch, user]);
 
     const handleLogout = () => {
         dispatch(logoutUser());
@@ -65,7 +55,7 @@ function Header() {
                                     </Link>
                                 </button>
                                 <button>
-                                    <Link to={ROUTES.PROFILE(user?.id)}>My prodile</Link>
+                                    <Link to={ROUTES.PROFILE(user?.id)}>My profile</Link>
                                 </button>
                             </div>
                         }

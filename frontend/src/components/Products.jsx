@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import {useDispatch, useSelector} from "react-redux";
 import { fetchProducts, selectProducts, selectError } from "../features/productSlice";
-import { addToCart, fetchCartByIds } from "../features/cartSlice";
+import { addToCart, fetchCartByIds, createCart } from "../features/cartSlice";
 import { selectSearchTerm } from "../features/searchSlice";
 import { Link } from "react-router-dom";
 import ROUTES from "../routes";
@@ -26,10 +26,18 @@ function Products() {
             await dispatch(addToCart({ cartId: cart.id, productId })).unwrap();
             // Re-fetch the cart to get the updated item_count
             await dispatch(fetchCartByIds(user.id)).unwrap();
-          } catch (error) {
-              console.error("Failed to add to cart:", error);
-          }
-      }
+        } catch (error) {
+            console.error("Failed to add to cart:", error);
+        }
+    } else if (user && isAuth && !cart) {
+        try {
+            await dispatch(createCart(user.id)).unwrap();
+            await dispatch(addToCart({ cartId: cart.id, productId })).unwrap();
+            await dispatch(fetchCartByIds(user.id)).unwrap();
+        } catch (error) {
+            console.error("Failed to add to cart:", error);
+        }
+    }
   };  
   
   return (

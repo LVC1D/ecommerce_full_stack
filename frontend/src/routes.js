@@ -7,6 +7,9 @@ const ROUTES = {
     ORDERS: `/orders`,
     PROFILE: (userId) => `/users/${userId}`,
     CART: (cartId) => `/cart/${cartId}/items`,
+    CHECKOUT: (cartId) => `/cart/${cartId}/checkout`,
+    SUCCESS: '/success',
+    CANCEL: '/cancel',
     NOT_FOUND: '/404',
 };
 

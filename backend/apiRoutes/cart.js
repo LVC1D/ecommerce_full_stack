@@ -1,5 +1,7 @@
 const express = require('express');
 const cartRouter = express.Router();
+const stripe = require('stripe')(process.env.STRIPE_CLIENT_SECRET);
+require('dotenv').config();
 
 module.exports = (pool, ensureAuthenticated, calculateSubtotal, incrementItemCount) => {
     
@@ -131,10 +133,38 @@ module.exports = (pool, ensureAuthenticated, calculateSubtotal, incrementItemCou
                     res.status(200).json({ message: "Cart item updated" });
                 }
             });
+        });
+
+        cartRouter.post('/:id/create-checkout', ensureAuthenticated, async (req, res) => {
+            const cartId = req.params.id;
+            // handle the Stripe-enabled payment gateway
+            const cartItemsResult = await pool.query('SELECT * FROM cart_items WHERE cart_id = $1', [cartId]);
+            const lineItems = cartItemsResult.rows.map((item) => {
+                return {
+                    price_data: {
+                        currency: 'usd',
+                        product_data: {
+                            name: item.product_id.toString(),
+                        },
+                        unit_amount: item.product_price * 100,
+                    },
+                    quantity: item.quantity,
+                };
+            });
+
+            const session = await stripe.checkout.sessions.create({
+                payment_method_types: ['card'],
+                line_items: lineItems,
+                mode: 'payment',
+                success_url: `https://localhost:5173/success`,
+                cancel_url: `https://localhost:5173/cancel`,
+            });
+            res.status(201).json({ id: session.id });
         })
 
         // to create a checkout router
         cartRouter.post('/:id/checkout', ensureAuthenticated, async (req, res) => {
+            // declare the params and the request body
             const cartId = req.params.id;
             let {userId, orderSum} = req.body;
 
@@ -142,7 +172,7 @@ module.exports = (pool, ensureAuthenticated, calculateSubtotal, incrementItemCou
                 res.status(400).json({ message: "Invalid cart ID" });
             return;
             }
-
+            // assign the dynamic values to our request body
             let subTotal = await pool.query('SELECT sub_total FROM cart WHERE id = $1', [cartId]);
             let user_id = await pool.query('SELECT user_id FROM cart WHERE id = $1', [cartId]);
             userId = user_id.rows[0].user_id;

@@ -7,7 +7,6 @@ const initialState = {
     error: null
 };
 
-// to fix this
 export const fetchOrders = createAsyncThunk(
     'orders/fetchOrders',
     async (userId) => {

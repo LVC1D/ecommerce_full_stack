@@ -68,6 +68,7 @@ button:focus-visible {
 
 .nav-bar {
   width: 100%;
+  background-color: inherit;
   display: flex;
   justify-content: space-around;
   align-items: center;

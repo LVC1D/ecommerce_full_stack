@@ -36,10 +36,7 @@ export const loginUser = createAsyncThunk(
         username,
         password,
       });
-      return {
-        user: data.user,
-        isAuth: true,
-      };
+      return data;
     } catch (error) {
       throw error.response.data;
     }
@@ -51,10 +48,7 @@ export const checkLoginStatus = createAsyncThunk(
   async () => {
     try {
       const response = await api.get('/api/auth/is_logged_in', {withCredentials: true});
-      return {
-        user: response.data.user,
-        isAuth: true,
-      };
+      return response.data;
     } catch (error) {
       return {
         user: null,
@@ -87,7 +81,7 @@ const authSlice = createSlice({
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.user = action.payload.user;
+        state.user = action.payload;
         state.isAuth = true;
       })
       .addCase(registerUser.rejected, (state, action) => {

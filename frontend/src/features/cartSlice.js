@@ -12,10 +12,9 @@ export const fetchCartByIds = createAsyncThunk(
     async (userId) => {
         try {
             const response = await api.get(`/cart?userId=${userId}`);
-            // console.log(response.data);
             return response.data;
         } catch (error) {
-            console.error("Error fetching cart by IDs:", error.response?.data || error.message);
+            // console.error("Error fetching cart by IDs:", error.response?.data || error.message);
             throw error.response?.data || error.message;
         }
     }
@@ -38,7 +37,6 @@ export const addToCart = createAsyncThunk(
     async ({ cartId, productId }) => {
         try {
             const response = await api.post(`/cart/${cartId}`, { productId });
-            // console.log(response.data);
             return response.data;
         } catch (error) {
             throw error.response?.data || error.message;

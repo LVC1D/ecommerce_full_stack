@@ -111,24 +111,97 @@ module.exports = (pool, ensureAuthenticated, calculateSubtotal, incrementItemCou
 
         cartRouter.put('/:id', ensureAuthenticated, async (req, res) => {
             const cartId = req.params.id;
-            const {quantity, productId} = req.body;
+            const { items } = req.body;
+
+            if (!cartId) {
+                res.status(400).json({ message: "Invalid cart ID" });
+                return;
+            }
+            if (!Array.isArray(items) || items.length === 0) {  
+                res.status(400).json({ message: "Invalid items" });
+                return;
+            }
+
+            try {
+                await pool.query('BEGIN');
+        
+                for (const item of items) {
+                    const {productId, quantity} = item;
+                    if (isNaN(quantity) || quantity < 0) {
+                        res.status(400).json({ message: "Invalid quantity" });
+                        return;
+                    }
+        
+                    await pool.query('UPDATE cart_items SET quantity = $1 WHERE cart_id = $2 AND product_id = $3', [quantity, cartId, productId]);
+                }
+        
+                const subTotal = await calculateSubtotal(cartId, pool);
+                await pool.query('UPDATE cart SET sub_total = $1 WHERE id = $2', [subTotal, cartId]);
+        
+                await pool.query('COMMIT');
+        
+                // Fetch the updated cart items
+                const updatedItemsResult = await pool.query('SELECT * FROM cart_items WHERE cart_id = $1', [cartId]);
+                console.log('Updated cart items:', updatedItemsResult.rows);
+                res.status(200).json({
+                    message: "Cart items updated",
+                    cartItems: updatedItemsResult.rows,
+                    subTotal: subTotal
+                });
+        
+            } catch (err) {
+                await pool.query('ROLLBACK');
+                console.error("Error updating cart:", err);
+                res.status(500).json({ message: err.message });
+            }
+        });
+
+        cartRouter.delete('/:id', ensureAuthenticated, async (req, res) => {
+            const cartId = req.params.id;
 
             if (!cartId) {
                 res.status(400).json({ message: "Invalid cart ID" });
                 return;
             }
 
-            if (isNaN(quantity)) {
-                res.status(400).json({ message: "Invalid quantity" });
+            await pool.query('DELETE FROM cart_items WHERE cart_id = $1', [cartId], async (err) => {
+                if (err) {
+                    console.error("Error deleting cart items:", err);
+                    res.status(500).json({ message: err.message });
+                } else {
+                    await pool.query('DELETE FROM cart WHERE id = $1', [cartId], (err) => {
+                        if (err) {
+                            console.error("Error deleting cart:", err);
+                            res.status(500).json({ message: err.message });
+                        } else {
+                            res.status(204).end();
+                        }
+                    });
+                }
+            });
+        });
+
+        cartRouter.delete('/:id/items/:productId', ensureAuthenticated, async (req, res) => {
+            const cartId = req.params.id;
+            const productId = req.params.productId;
+
+            if (!cartId) {
+                res.status(400).json({ message: "Invalid cart ID" });
                 return;
             }
 
-            await pool.query('UPDATE cart_items SET quantity = $1 WHERE cart_id = $2 AND product_id = $3', [quantity, cartId, productId], async (err, result) => {
+            if (!productId) {
+                res.status(400).json({ message: "Invalid product ID" });
+                return;
+            }
+
+            await pool.query('DELETE FROM cart_items WHERE cart_id = $1 AND product_id = $2', [cartId, productId], async (err) => {
                 if (err) {
-                    console.error("Error updating cart item:", err);
+                    console.error("Error deleting cart item:", err);
                     res.status(500).json({ message: err.message });
                 } else {
                     let subTotal = await calculateSubtotal(cartId, pool);
+                    let count = await incrementItemCount(cartId, pool);
                     await pool.query('UPDATE cart SET sub_total = $1 WHERE id = $2', [subTotal, cartId]);
                     res.status(200).json({ message: "Cart item updated" });
                 }
@@ -173,21 +246,35 @@ module.exports = (pool, ensureAuthenticated, calculateSubtotal, incrementItemCou
             return;
             }
             // assign the dynamic values to our request body
-            let subTotal = await pool.query('SELECT sub_total FROM cart WHERE id = $1', [cartId]);
-            let user_id = await pool.query('SELECT user_id FROM cart WHERE id = $1', [cartId]);
-            userId = user_id.rows[0].user_id;
-            orderSum = subTotal.rows[0].sub_total;
-
-            await pool.query('INSERT INTO orders (user_id, order_sum) VALUES ($1, $2) RETURNING *', [userId, orderSum], async (err, result) => {
-            if (err) {
-                console.error("Error creating order:", err);
-                res.status(500).json({ message: err.message });
-            } else {
+            try {
+                await pool.query('BEGIN');
+        
+                let subTotalResult = await pool.query('SELECT sub_total FROM cart WHERE id = $1', [cartId]);
+                let userResult = await pool.query('SELECT user_id FROM cart WHERE id = $1', [cartId]);
+        
+                if (!subTotalResult.rows[0] || !userResult.rows[0]) {
+                    await pool.query('ROLLBACK');
+                    res.status(404).json({ message: "Cart not found" });
+                    return;
+                }
+        
+                userId = userResult.rows[0].user_id;
+                orderSum = subTotalResult.rows[0].sub_total;
+        
+                const orderResult = await pool.query('INSERT INTO orders (user_id, order_sum) VALUES ($1, $2) RETURNING *', [userId, orderSum]);
+        
                 await pool.query('DELETE FROM cart_items WHERE cart_id = $1', [cartId]);
                 await pool.query('DELETE FROM cart WHERE id = $1', [cartId]);
-                res.status(201).json(result.rows[0]);
+                await pool.query('INSERT INTO cart (user_id) VALUES ($1)', [userId]);
+        
+                await pool.query('COMMIT');
+        
+                res.status(201).json(orderResult.rows[0]);
+            } catch (err) {
+                await pool.query('ROLLBACK');
+                console.error("Error creating order:", err);
+                res.status(500).json({ message: err.message });
             }
-            })
         });
     
         return cartRouter;

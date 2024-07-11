@@ -21,22 +21,14 @@ function Products() {
   }, [dispatch, searchTerm]);
 
   const handleAddToCart = async (productId) => {
-    if (user && isAuth && cart) {
-        try {
-            await dispatch(addToCart({ cartId: cart.id, productId })).unwrap();
-            // Re-fetch the cart to get the updated item_count
-            await dispatch(fetchCartByIds(user.id)).unwrap();
-        } catch (error) {
-            console.error("Failed to add to cart:", error);
-        }
-    } else if (user && isAuth && !cart) {
-        try {
-            await dispatch(createCart(user.id)).unwrap();
-            await dispatch(addToCart({ cartId: cart.id, productId })).unwrap();
-            await dispatch(fetchCartByIds(user.id)).unwrap();
-        } catch (error) {
-            console.error("Failed to add to cart:", error);
-        }
+    try {
+      if (user && isAuth && cart) {
+        await dispatch(addToCart({ cartId: cart.id, productId })).unwrap();
+          // Re-fetch the cart to get the updated item_count
+          await dispatch(fetchCartByIds(user.id)).unwrap();
+      } 
+    } catch (error) {
+        console.error("Failed to add to cart:", error);
     }
   };  
   

@@ -23,15 +23,27 @@ export const fetchCartItems = createAsyncThunk(
 
 export const updateCart = createAsyncThunk(
     'cartItems/updateCart',
-    async ({cartId, productId, quantity}) => {
+    async ({cartId, items}) => {
         try {
-            const response = await api.put(`/cart/${cartId}`, {productId, quantity});
-            return response.data;
+            const response = await api.put(`/cart/${cartId}`, {items});
+            return response.data.cartItems;
         } catch (error) {
             return error.response.data;
         }
     }
 );
+
+export const removeFromCart = createAsyncThunk(
+    'cartItems/removeFromCart',
+    async ({cartId, productId}) => {
+        try {
+            const response = await api.delete(`/cart/${cartId}/items/${productId}`);
+            return { productId, cartId, ...response.data };
+        } catch (error) {
+            return error.response.data;
+        }
+    }
+)
 
 export const makePayment = createAsyncThunk(
     'cartItems/makePayment',
@@ -113,6 +125,10 @@ const cartItemSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
+            .addCase(removeFromCart.fulfilled, (state, action) => {
+                state.cartItems = state.cartItems.filter(item => item.product_id !== action.payload.productId);
+                state.loading = false;
+            })
             .addCase(makePayment.pending, (state, action) => {
                 state.loading = true;
             })
@@ -128,6 +144,7 @@ const cartItemSlice = createSlice({
             })
             .addCase(createOrder.fulfilled, (state, action) => {
                 state.loading = false;
+                state.cartItems = [];
             })
             .addCase(createOrder.rejected, (state, action) => {
                 state.loading = false;

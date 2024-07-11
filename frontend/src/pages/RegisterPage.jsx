@@ -1,4 +1,4 @@
-import React from 'react';
+import {useEffect} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { registerUser } from '../features/authSlice';
 import { useNavigate } from 'react-router-dom';
@@ -16,7 +16,7 @@ const validationSchema = Yup.object().shape({
 
 const RegisterPage = () => {
   const dispatch = useDispatch();
-  const { status, error } = useSelector((state) => state.auth);
+  const { isAuth, status, error } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const initialValues = {
     username: '',
@@ -26,9 +26,14 @@ const RegisterPage = () => {
     address: '',
   };
 
+  useEffect(() => {
+    if (isAuth) {
+      navigate(ROUTES.HOME);
+    }
+  }, [isAuth, navigate]);
+
   const handleRegister = (values) => {
     dispatch(registerUser(values));
-    navigate(ROUTES.LOGIN);
   };
 
   return (

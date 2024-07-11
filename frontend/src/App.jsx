@@ -12,11 +12,7 @@ import CartItems from './pages/CartItems';
 import Success from './pages/Success';
 import Cancel from './pages/Cancel';
 import ROUTES from './routes';
-// import {Elements} from '@stripe/react-stripe-js';
-// import {loadStripe} from '@stripe/stripe-js';
 import './App.css';
-
-// const loadStripePromise = loadStripe('pk_test_51PRwp300S9GEcTS4vjzkKyI6tJYHChAXPBEG3Gu64COTqlATyKlibDv4eYyJZ5YkPeaS6q5fQncD4QkWJuK9zWU500SCWXlrmq');
 
 const router = createBrowserRouter(createRoutesFromElements(
   <Route path={ROUTES.HOME} element={<Root/>}>

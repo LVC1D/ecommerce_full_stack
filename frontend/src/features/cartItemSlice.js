@@ -26,7 +26,8 @@ export const updateCart = createAsyncThunk(
     async ({cartId, items}) => {
         try {
             const response = await api.put(`/cart/${cartId}`, {items});
-            return response.data.cartItems;
+            console.log('Response:', response.data)
+            return response.data;
         } catch (error) {
             return error.response.data;
         }
@@ -38,7 +39,8 @@ export const removeFromCart = createAsyncThunk(
     async ({cartId, productId}) => {
         try {
             const response = await api.delete(`/cart/${cartId}/items/${productId}`);
-            return { productId, cartId, ...response.data };
+            console.log('Response:', response.data)
+            return response.data;
         } catch (error) {
             return error.response.data;
         }
@@ -119,15 +121,15 @@ const cartItemSlice = createSlice({
             })
             .addCase(updateCart.fulfilled, (state, action) => {
                 state.loading = false;
-                state.cartItems = action.payload;
+                state.cartItems = action.payload.cartItems;
             })
             .addCase(updateCart.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             })
             .addCase(removeFromCart.fulfilled, (state, action) => {
-                state.cartItems = state.cartItems.filter(item => item.product_id !== action.payload.productId);
                 state.loading = false;
+                state.cartItems = state.cartItems.filter(item => item.product_id !== action.payload.productId);
             })
             .addCase(makePayment.pending, (state, action) => {
                 state.loading = true;

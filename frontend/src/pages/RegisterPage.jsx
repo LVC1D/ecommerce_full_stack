@@ -30,7 +30,7 @@ const RegisterPage = () => {
     if (isAuth) {
       navigate(ROUTES.HOME);
     }
-  }, [isAuth, navigate]);
+  }, [isAuth, navigate])
 
   const handleRegister = (values) => {
     dispatch(registerUser(values));

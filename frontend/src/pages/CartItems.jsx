@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import { addByOne, removeByOne, setQuantity, fetchCartItems, updateCart, removeFromCart, makePayment } from "../features/cartItemSlice";
+import { addByOne, removeByOne, fetchCartItems, updateCart, removeFromCart, makePayment } from "../features/cartItemSlice";
 
 export default function CartItems() {
     const dispatch = useDispatch();
@@ -19,37 +19,30 @@ export default function CartItems() {
     }, [dispatch, cart]);
 
     const handleQuantityChange = (productId, quantity) => {
-        setLocalCartItems((prevItems) =>
-            prevItems.map((item) =>
-                item.product_id === productId ? { ...item, quantity } : item
-            )
-        );
+        setLocalCartItems((prevItems) => {
+            return prevItems.map((item) => {
+                return item.product_id === productId ? { ...item, quantity } : item;
+            });
+        });
     };
 
     const handlePayment = () => {
         dispatch(makePayment(cart.id));
     };
 
-    const handleUpdate = () => {
-        dispatch(updateCart({
-            cartId: cart.id,
-            items: localCartItems
-        }));
+    const handleUpdate = (cartId, items) => {
+        console.log('Updating cart:', cartId, items);
+        dispatch(updateCart({ cartId, items })).then(() => {
+            dispatch(fetchCartItems(cartId));
+        });
     };
 
     const handleRemove = (cartId, productId) => {
-        dispatch(removeFromCart({
-            cartId,
-            productId
-        })).then(() => {
-            console.log('Item removed:', productId);
-            dispatch(fetchCartItems(cartId)).then((action) => {
-                if (action.payload) {
-                    setLocalCartItems(action.payload);
-                }
-            });
+        console.log('Removing item from cart:', productId);
+        dispatch(removeFromCart({ cartId, productId })).then(() => {
+            dispatch(fetchCartItems(cartId));
         });
-    }
+    };
 
     if (loading) {
         return <p>Loading...</p>;
@@ -63,7 +56,7 @@ export default function CartItems() {
         <div>
             <h1>Cart Items</h1>
             <ul>
-                {cartItems && cartItems.length > 0 ? cartItems.map((item) => (
+                {localCartItems ? localCartItems.map((item) => (
                     <li key={item.product_id}>
                         <p>Price: ${item.product_price}</p>
                         <p>Quantity: {item.quantity}</p>
@@ -79,7 +72,7 @@ export default function CartItems() {
                     </li>
                 )) : <p>Your cart is empty.</p>}
             </ul>
-            <button onClick={handleUpdate}>
+            <button onClick={() => handleUpdate(cart.id, cartItems)}>
                 Update cart
             </button>
             <button onClick={handlePayment}>

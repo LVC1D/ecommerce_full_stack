@@ -127,6 +127,7 @@ module.exports = (pool, ensureAuthenticated, calculateSubtotal, incrementItemCou
         
                 for (const item of items) {
                     const {productId, quantity} = item;
+                    console.log('Updating item:', productId, 'with quantity:', quantity);
                     if (isNaN(quantity) || quantity < 0) {
                         res.status(400).json({ message: "Invalid quantity" });
                         return;
@@ -202,11 +203,11 @@ module.exports = (pool, ensureAuthenticated, calculateSubtotal, incrementItemCou
                 } else {
                     let subTotal = await calculateSubtotal(cartId, pool);
                     let count = await incrementItemCount(cartId, pool);
-                    await pool.query('UPDATE cart SET sub_total = $1 WHERE id = $2', [subTotal, cartId]);
-                    res.status(200).json({ message: "Cart item updated" });
+                    const shrunkResult = await pool.query('UPDATE cart SET sub_total = $1, item_count = $2 WHERE id = $3', [subTotal, count, cartId]);
+                    res.status(204).json(shrunkResult.rows[0]);
                 }
             });
-        });
+        })
 
         cartRouter.post('/:id/create-checkout', ensureAuthenticated, async (req, res) => {
             const cartId = req.params.id;
@@ -219,7 +220,7 @@ module.exports = (pool, ensureAuthenticated, calculateSubtotal, incrementItemCou
                         product_data: {
                             name: item.product_id.toString(),
                         },
-                        unit_amount: item.product_price * 100,
+                        unit_amount: Math.round(item.product_price * 100),
                     },
                     quantity: item.quantity,
                 };
@@ -229,8 +230,8 @@ module.exports = (pool, ensureAuthenticated, calculateSubtotal, incrementItemCou
                 payment_method_types: ['card'],
                 line_items: lineItems,
                 mode: 'payment',
-                success_url: `https://localhost:5173/success`,
-                cancel_url: `https://localhost:5173/cancel`,
+                success_url: "https://localhost:5173/success",
+                cancel_url: "https://localhost:5173/cancel",
             });
             res.status(201).json({ id: session.id });
         })

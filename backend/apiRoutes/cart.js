@@ -203,8 +203,13 @@ module.exports = (pool, ensureAuthenticated, calculateSubtotal, incrementItemCou
                 } else {
                     let subTotal = await calculateSubtotal(cartId, pool);
                     let count = await incrementItemCount(cartId, pool);
-                    const shrunkResult = await pool.query('UPDATE cart SET sub_total = $1, item_count = $2 WHERE id = $3', [subTotal, count, cartId]);
-                    res.status(204).json(shrunkResult.rows[0]);
+                    await pool.query('UPDATE cart SET sub_total = $1, item_count = $2 WHERE id = $3', [subTotal, count, cartId]);
+                    const updatedItemsResult = await pool.query('SELECT * FROM cart_items WHERE cart_id = $1', [cartId]);
+                    res.status(200).json({
+                        message: "Cart item deleted",
+                        cartItems: updatedItemsResult.rows,
+                        subTotal: subTotal
+                    });
                 }
             });
         })

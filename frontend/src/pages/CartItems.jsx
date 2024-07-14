@@ -1,48 +1,37 @@
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
-import { addByOne, removeByOne, fetchCartItems, updateCart, removeFromCart, makePayment } from "../features/cartItemSlice";
+import { useEffect } from "react";
+import { fetchCartItems, updateCart, removeFromCart, makePayment, addByOne, removeByOne,setQuantity } from "../features/cartItemSlice";
+import { fetchCartByIds } from "../features/cartSlice";
 
 export default function CartItems() {
     const dispatch = useDispatch();
-    const {cart} = useSelector((state) => state.cart);
-    const {cartItems, loading, error} = useSelector((state) => state.cartItems);
-    const [localCartItems, setLocalCartItems] = useState([]);
+    const { cart } = useSelector((state) => state.cart);
+    const { cartItems, subTotal, loading, error } = useSelector((state) => state.cartItems);
+    const {user} = useSelector((state) => state.auth);
 
     useEffect(() => {
         if (cart) {
-            dispatch(fetchCartItems(cart.id)).then((action) => {
-                if (action.payload) {
-                    setLocalCartItems(action.payload);
-                }
-            });
+            dispatch(fetchCartItems(cart.id));
         }
     }, [dispatch, cart]);
-
-    const handleQuantityChange = (productId, quantity) => {
-        setLocalCartItems((prevItems) => {
-            return prevItems.map((item) => {
-                return item.product_id === productId ? { ...item, quantity } : item;
-            });
-        });
-    };
 
     const handlePayment = () => {
         dispatch(makePayment(cart.id));
     };
 
-    const handleUpdate = (cartId, items) => {
-        console.log('Updating cart:', cartId, items);
-        dispatch(updateCart({ cartId, items })).then(() => {
-            dispatch(fetchCartItems(cartId));
-        });
+    const handleUpdate = async () => {
+        await dispatch(updateCart({
+            cartId: cart.id,
+            items: cartItems
+        })).unwrap();
     };
 
-    const handleRemove = (cartId, productId) => {
-        console.log('Removing item from cart:', productId);
-        dispatch(removeFromCart({ cartId, productId })).then(() => {
-            dispatch(fetchCartItems(cartId));
-        });
-    };
+    const handleRemove = async (productId) => {
+        if (cart) {
+            await dispatch(removeFromCart({ cartId: cart.id, productId })).unwrap();
+            await dispatch(fetchCartByIds(user.id)).unwrap();
+        }
+    }
 
     if (loading) {
         return <p>Loading...</p>;
@@ -56,25 +45,23 @@ export default function CartItems() {
         <div>
             <h1>Cart Items</h1>
             <ul>
-                {localCartItems ? localCartItems.map((item) => (
+                {cartItems.length > 0 ? cartItems.map((item) => (
                     <li key={item.product_id}>
                         <p>Price: ${item.product_price}</p>
                         <p>Quantity: {item.quantity}</p>
                         <button onClick={() => dispatch(addByOne({ productId: item.product_id }))}>+</button>
                         <button onClick={() => dispatch(removeByOne({ productId: item.product_id }))}>-</button>
-                        <input 
-                            type='number' 
-                            value={item.quantity} 
-                            onChange={(e) => handleQuantityChange(item.product_id, parseInt(e.target.value, 10))} />
-                        <button onClick={() => handleRemove(cart.id, item.product_id)}>
+                        <input type='number' value={item.quantity} onChange={(e) => dispatch(setQuantity({ productId: item.product_id, quantity: parseInt(e.target.value, 10) }))} />
+                        <button onClick={() => handleRemove(item.product_id)}>
                             Remove
                         </button>
                     </li>
                 )) : <p>Your cart is empty.</p>}
             </ul>
-            <button onClick={() => handleUpdate(cart.id, cartItems)}>
+            <button onClick={handleUpdate}>
                 Update cart
             </button>
+            <p>Subtotal: ${subTotal}</p>
             <button onClick={handlePayment}>
                 Proceed to checkout
             </button>

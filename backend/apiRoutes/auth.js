@@ -216,10 +216,10 @@ const initAuth = (app) => {
         resave: false,
         saveUninitialized: false,
         cookie: { 
-            secure: true,
+            secure: process.env.NODE_ENV === 'production', //true
             httpOnly: true, 
             maxAge: 8640000000,
-            sameSite: 'none'
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax' //'none'
         },
         store: store
     }));

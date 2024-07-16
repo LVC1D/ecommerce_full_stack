@@ -15,20 +15,28 @@ import ROUTES from './routes';
 import './App.css';
 
 const router = createBrowserRouter(createRoutesFromElements(
-  <Route path={ROUTES.HOME} element={<Root/>}>
-    <Route index element={<Products/>}/>
-    <Route path={ROUTES.PRODUCT(':productId')} element={<ProductDetails/>}/>
-    <Route path={ROUTES.LOGIN} element={<LoginPage/>}/>
-    <Route path={ROUTES.REGISTER} element={<RegisterPage/>}/>
-    <Route path={ROUTES.ORDERS} element={<Orders/>}/>
-    <Route path={ROUTES.PROFILE(':userId')} element={<UserProfile/>} />
-    <Route path={ROUTES.CART(':cartId')} element={<CartItems/>}/>
-    <Route path={ROUTES.SUCCESS} element={<Success/>}/>
-    <Route path={ROUTES.CANCEL} element={<Cancel/>}/>
-  </Route>
+  <>
+    <Route path={ROUTES.HOME} element={<Root/>}>
+      <Route index element={<Products/>}/>
+      <Route path={ROUTES.PRODUCT(':productId')} element={<ProductDetails/>}/>
+      <Route path={ROUTES.LOGIN} element={<LoginPage/>}/>
+      <Route path={ROUTES.REGISTER} element={<RegisterPage/>}/>
+      <Route path={ROUTES.ORDERS} element={<Orders/>}/>
+      <Route path={ROUTES.PROFILE(':userId')} element={<UserProfile/>} />
+      <Route path={ROUTES.CART(':cartId')} element={<CartItems/>}/>
+      <Route path={ROUTES.SUCCESS} element={<Success/>}/>
+      <Route path={ROUTES.CANCEL} element={<Cancel/>}/>
+    </Route>
+  </>  
 ))
 
 function App() {
+  // const dispatch = useDispatch();
+
+  // useEffect(() => {
+  //   dispatch(checkLoginStatus());
+  // }, [dispatch]);
+  
   return (
     <Provider store={store}>
       <RouterProvider router={router}/>

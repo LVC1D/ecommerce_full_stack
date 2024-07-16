@@ -1,17 +1,21 @@
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
-import { fetchCartItems, updateCart, removeFromCart, makePayment, addByOne, removeByOne,setQuantity } from "../features/cartItemSlice";
+import { useEffect, useState } from "react";
+import { fetchCartItems, updateCart, removeFromCart, makePayment } from "../features/cartItemSlice";
 import { fetchCartByIds } from "../features/cartSlice";
 
 export default function CartItems() {
     const dispatch = useDispatch();
     const { cart } = useSelector((state) => state.cart);
-    const { cartItems, subTotal, loading, error } = useSelector((state) => state.cartItems);
-    const {user} = useSelector((state) => state.auth);
+    const { loading, error } = useSelector((state) => state.cartItems);
+    const { user } = useSelector((state) => state.auth);
+
+    const [localCartItems, setLocalCartItems] = useState([]);
 
     useEffect(() => {
         if (cart) {
-            dispatch(fetchCartItems(cart.id));
+            dispatch(fetchCartItems(cart.id)).then((action) => {
+                setLocalCartItems(action.payload);
+            });
         }
     }, [dispatch, cart]);
 
@@ -22,16 +26,28 @@ export default function CartItems() {
     const handleUpdate = async () => {
         await dispatch(updateCart({
             cartId: cart.id,
-            items: cartItems
+            items: localCartItems
         })).unwrap();
+        const updatedCartItems = await dispatch(fetchCartByIds(user.id)).unwrap();
+        setLocalCartItems(updatedCartItems);
+        console.log("Current Cart items: ", localCartItems);
     };
 
     const handleRemove = async (productId) => {
         if (cart) {
             await dispatch(removeFromCart({ cartId: cart.id, productId })).unwrap();
-            await dispatch(fetchCartByIds(user.id)).unwrap();
+            const updatedCartItems = await dispatch(fetchCartByIds(user.id)).unwrap();
+            setLocalCartItems(updatedCartItems);
         }
-    }
+    };
+
+    const handleQuantityChange = (product_id, quantity) => {
+        setLocalCartItems((prevItems) =>
+            prevItems.map((item) =>
+                item.product_id === product_id ? { ...item, quantity: parseInt(quantity, 10) } : item
+            )
+        );
+    };
 
     if (loading) {
         return <p>Loading...</p>;
@@ -45,13 +61,13 @@ export default function CartItems() {
         <div>
             <h1>Cart Items</h1>
             <ul>
-                {cartItems.length > 0 ? cartItems.map((item) => (
+                {cartItems && cartItems.length > 0 ? cartItems.map((item) => (
                     <li key={item.product_id}>
                         <p>Price: ${item.product_price}</p>
                         <p>Quantity: {item.quantity}</p>
-                        <button onClick={() => dispatch(addByOne({ productId: item.product_id }))}>+</button>
-                        <button onClick={() => dispatch(removeByOne({ productId: item.product_id }))}>-</button>
-                        <input type='number' value={item.quantity} onChange={(e) => dispatch(setQuantity({ productId: item.product_id, quantity: parseInt(e.target.value, 10) }))} />
+                        <button onClick={() => handleQuantityChange(item.product_id, item.quantity + 1)}>+</button>
+                        <button onClick={() => handleQuantityChange(item.product_id, item.quantity - 1)}>-</button>
+                        <input type='number' value={item.quantity} onChange={(e) => handleQuantityChange(item.product_id, e.target.value)} />
                         <button onClick={() => handleRemove(item.product_id)}>
                             Remove
                         </button>
@@ -66,5 +82,5 @@ export default function CartItems() {
                 Proceed to checkout
             </button>
         </div>
-    )
+    );
 }

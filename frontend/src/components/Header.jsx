@@ -26,13 +26,9 @@ function Header() {
         dispatch(logoutUser());
     };
 
-    useEffect(() => {
-        dispatch(checkLoginStatus());
-    }, [dispatch]);
-
     const handleUserTooltip = () => {
         dispatch(toggleTooltip());
-    }
+    };
 
     return (
         <div className='nav-bar'>

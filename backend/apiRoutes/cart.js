@@ -62,6 +62,7 @@ module.exports = (pool, ensureAuthenticated, calculateSubtotal, incrementItemCou
                     res.status(500).json({ message: err.message });
                 } else {
                     res.status(201).json(result.rows[0]);
+                    console.log("Cart created:", result.rows[0]);
                 }
             });
         });
@@ -133,7 +134,9 @@ module.exports = (pool, ensureAuthenticated, calculateSubtotal, incrementItemCou
                         return;
                     }
         
-                    await pool.query('UPDATE cart_items SET quantity = $1 WHERE cart_id = $2 AND product_id = $3', [quantity, cartId, productId]);
+                    await pool.query('UPDATE cart_items SET quantity = $1 WHERE cart_id = $2 AND product_id = $3', [quantity, cartId, product_id]);
+
+                    // console.log(item);
                 }
         
                 const subTotal = await calculateSubtotal(cartId, pool);
@@ -271,7 +274,7 @@ module.exports = (pool, ensureAuthenticated, calculateSubtotal, incrementItemCou
         
                 await pool.query('DELETE FROM cart_items WHERE cart_id = $1', [cartId]);
                 await pool.query('DELETE FROM cart WHERE id = $1', [cartId]);
-                await pool.query('INSERT INTO cart (user_id) VALUES ($1)', [userId]);
+                // await pool.query('INSERT INTO cart (user_id) VALUES ($1) ON CONFLICT (user_id) DO NOTHING', [userId]);
         
                 await pool.query('COMMIT');
         

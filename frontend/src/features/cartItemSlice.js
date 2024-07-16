@@ -24,10 +24,11 @@ export const fetchCartItems = createAsyncThunk(
 export const updateCart = createAsyncThunk(
     'cartItems/updateCart',
     async ({ cartId, items }) => {
+    async ({ cartId, items }) => {
         try {
             const response = await api.put(`/cart/${cartId}`, { items });
-            console.log('Response:', response.data);
-            return response.data;
+            console.log('Response:', response.data.cartItems);
+            return response.data.cartItems;
         } catch (error) {
             throw new Error(error.response.data.message || 'Failed to update cart');
         }
@@ -82,24 +83,24 @@ const cartItemSlice = createSlice({
     initialState,
     reducers: {
         addByOne: (state, action) => {
-            const { productId } = action.payload;
-            const item = state.cartItems.find((item) => item.productId === productId);
+            const { product_id } = action.payload;
+            const item = state.cartItems.find((item) => item.product_id === product_id);
             if (item) {
                 item.quantity += 1;
             }
         },
         removeByOne: (state, action) => {
-            const { productId } = action.payload;
-            const item = state.cartItems.find((item) => item.productId === productId);
+            const { product_id } = action.payload;
+            const item = state.cartItems.find((item) => item.product_id === product_id);
             if (item) {
                 item.quantity -= 1;
             }
         },
         setQuantity: (state, action) => {
-            const { productId, quantity } = action.payload;
-            const item = state.cartItems.find((item) => item.productId === productId);
+            const { product_id, quantity } = action.payload;
+            const item = state.cartItems.find((item) => item.product_id === product_id);
             if (item) {
-                state.itemQuantity = quantity;
+                item.quantity = quantity;
             }
         }
     },

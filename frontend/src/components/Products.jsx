@@ -1,15 +1,13 @@
 import { useEffect } from "react";
 import {useDispatch, useSelector} from "react-redux";
 import { fetchProducts, selectProducts, selectError } from "../features/productSlice";
-import { addToCart, fetchCartByIds, createCart } from "../features/cartSlice";
+import { addToCart, fetchCartByIds } from "../features/cartSlice";
 import { selectSearchTerm } from "../features/searchSlice";
 import { Link } from "react-router-dom";
 import ROUTES from "../routes";
 
 function Products() {
   const products = useSelector(selectProducts);
-  // const isLoading = useSelector(selectIsLoading);
-  // // const isLoading = useSelector(selectIsLoading);
   const isError = useSelector(selectError);
   const dispatch = useDispatch();
   const {cart} = useSelector((state) => state.cart);
@@ -22,15 +20,15 @@ function Products() {
 
   const handleAddToCart = async (productId) => {
     try {
-      if (user && isAuth && cart) {
+      if (user && isAuth) {
         await dispatch(addToCart({ cartId: cart.id, productId })).unwrap();
-          // Re-fetch the cart to get the updated item_count
-          await dispatch(fetchCartByIds(user.id)).unwrap();
-      } 
+        await dispatch(fetchCartByIds(user.id)).unwrap();
+        console.log("Item added for the user:", user.id, "and cart:", cart.id)
+      }
     } catch (error) {
-        console.error("Failed to add to cart:", error);
+      console.error("Failed to add to cart:", error);
     }
-  };  
+  };
   
   return (
     <div>

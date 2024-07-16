@@ -25,8 +25,10 @@ export const createCart = createAsyncThunk(
     async (userId) => {
         try {
             const response = await api.post('/cart?userId=' + userId);
+            console.log('Cart created:', response.data);
             return response.data;
         } catch (error) {
+            console.error("Error creating cart:", error.response.data);
             throw error.response.data;
         }
     }

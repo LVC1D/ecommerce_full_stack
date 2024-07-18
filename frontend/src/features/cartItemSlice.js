@@ -24,7 +24,6 @@ export const fetchCartItems = createAsyncThunk(
 export const updateCart = createAsyncThunk(
     'cartItems/updateCart',
     async ({ cartId, items }) => {
-    async ({ cartId, items }) => {
         try {
             const response = await api.put(`/cart/${cartId}`, { items });
             console.log('Response:', response.data.cartItems);

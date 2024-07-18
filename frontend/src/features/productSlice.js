@@ -35,12 +35,12 @@ export const fetchProductById = createAsyncThunk(
 
 export const fetchProductsBySearchTerm = createAsyncThunk(
     'products/fetchProductsBySearchTerm',
-    async (searchTerm) => {
+    async (searchTerm, {rejectWithValue}) => {
         try {
             const response = await api.get(`/products/search/${searchTerm}`);
             return response.data;
         } catch (error) {
-            throw error.response.data;
+            return rejectWithValue(error.response.data);
         }
     }
 )

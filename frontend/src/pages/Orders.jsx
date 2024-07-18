@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectOrders, selectIsLoading, selectError, fetchOrders } from "../features/orderSlice";
+import './Orders.css';
 
 function Orders () {
 
@@ -16,21 +17,25 @@ function Orders () {
     }, [dispatch, isAuth, user?.id]);
 
     return (
-        <div>
-            <h1>Orders of {user?.username}</h1>
-            {isLoading && <p>Loading...</p>}
-            {isAuth ? (
-                orders.map((order) => (
-                    <div key={order.id}>
-                        <h3>Order ID: {order.id}</h3>
-                        <p>Order Date: {order.order_date}</p>
-                        <p>Total: {order.order_sum}</p>
-                    </div>
-                ))
-            ) : (
-                <p>Please log in to see your orders.</p>
-            )}
-            {error && <p>{error.message}</p>}
+        <div className="orders-container">
+            <div className="orders-header">
+                <h1>Orders of {user?.name}</h1>
+            </div>
+            <div className="orders-list">
+                {isLoading && <p className="message">Loading...</p>}
+                {isAuth ? (
+                    orders.map((order) => (
+                        <div key={order.id} className="order-item">
+                            <h3>Order ID: {order.id}</h3>
+                            <p>Order Date: {order.order_date.split('T')[0]}</p>
+                            <p>Total: {order.order_sum}</p>
+                        </div>
+                    ))
+                ) : (
+                    <p className="message">Please log in to see your orders.</p>
+                )}
+                {error && <p className="message error">{error.message}</p>}
+            </div>
         </div>
     )
 }

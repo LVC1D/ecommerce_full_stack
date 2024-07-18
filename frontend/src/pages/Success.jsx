@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { setUser } from "../features/authSlice";
 import { createOrder, fetchCartItems } from "../features/cartItemSlice";
 import { createCart, fetchCartByIds } from "../features/cartSlice";
 import ROUTES from "../routes";
@@ -8,26 +9,29 @@ import ROUTES from "../routes";
 export default function Success() {
     const dispatch = useDispatch();
     const { cart } = useSelector((state) => state.cart);
-    const { user } = useSelector((state) => state.auth);
+    const { user, isAuth } = useSelector((state) => state.auth);
     const [orderCreated, setOrderCreated] = useState(false);
 
     useEffect(() => {
-        
         if (cart && user && !orderCreated) {
             dispatch(createOrder({
                 cartId: cart?.id,
                 userId: user?.id,
                 orderSum: cart.sub_total
-            })).then(() => {
+            }))
+            .then(() => {
                 setOrderCreated(true);
                 dispatch(createCart(user?.id)).then(() => {
                     dispatch(fetchCartByIds(user?.id));
                     dispatch(fetchCartItems(cart?.id));
-                })
+                });
             });
         }
-        
     }, [cart, dispatch, user, orderCreated]);
+
+    useEffect(() => {
+        dispatch(setUser(isAuth));
+    }, [isAuth, dispatch])
 
     return (
         <div>

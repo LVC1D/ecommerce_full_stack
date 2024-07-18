@@ -1,0 +1,45 @@
+.register-form {
+    display: flex;
+    width: 100vw; /* Ensure it takes the full viewport width */
+    height: 100vh; /* Ensure it takes the full viewport height */
+}
+
+.banner {
+    background: url('../assets/Wooden_board_on_white_surface.jpg');
+    background-position: center;
+    background-size: cover;
+    flex: 1; /* Takes half of the space because of flexbox */
+    width: 50%; /* Ensure it takes half of the width */
+    height: 100%; /* Ensure it takes full height */
+    font-weight: bold;
+    margin: 0; /* Remove margin to use full space */
+    align-content: center;
+}
+
+.fields {
+    flex: 1; /* Takes the remaining half of the space */
+    width: 50%; /* Ensure it takes half of the width */
+    height: auto; /* Ensure it takes full height */
+    padding: 20px; /* Add some padding for inner spacing */
+    display: flex;
+    flex-direction: column; /* Arrange children in a column */
+    justify-content: center; /* Center content vertically */
+    align-items: center; /* Center content horizontally */
+    border: 1px solid #fff;
+}
+
+#register {
+    width: 32.5%;
+    text-align: center;
+    font-size: 1rem;
+    margin: 0 auto;
+}
+
+.register-form input {
+    width: 250px;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    display: block;
+}

@@ -61,7 +61,7 @@ export default function CartItems() {
         <div>
             <h1>Cart Items</h1>
             <ul>
-                {cartItems && cartItems.length > 0 ? cartItems.map((item) => (
+                {localCartItems.length > 0 ? localCartItems.map((item) => (
                     <li key={item.product_id}>
                         <p>Price: ${item.product_price}</p>
                         <p>Quantity: {item.quantity}</p>
@@ -77,7 +77,6 @@ export default function CartItems() {
             <button onClick={handleUpdate}>
                 Update cart
             </button>
-            <p>Subtotal: ${subTotal}</p>
             <button onClick={handlePayment}>
                 Proceed to checkout
             </button>

@@ -1,0 +1,63 @@
+/* Container for the Orders component */
+.orders-container {
+    margin: 50px auto;
+    padding: 20px;
+    background: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    width: 1200px;
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+}
+
+/* Header styling */
+.orders-header {
+    text-align: center;
+    margin: auto;
+    width: 50%;
+}
+
+.orders-header h1 {
+    font-size: 2.7rem;
+    color: #333;
+}
+
+/* Order item styling */
+.orders-list {
+    overflow: scroll;
+    max-height: 800px;
+    width: 50%;
+}
+
+.order-item {
+    border-bottom: 1px solid #eaeaea;
+    padding: 15px 0;
+}
+
+.order-item:last-child {
+    border-bottom: none;
+}
+
+.order-item h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #555;
+}
+
+.order-item p {
+    margin: 5px 0;
+    font-size: 16px;
+    color: #777;
+}
+
+/* Loading and error message styling */
+.message {
+    text-align: center;
+    font-size: 16px;
+    color: #666;
+}
+
+.message.error {
+    color: #ff4d4d;
+}

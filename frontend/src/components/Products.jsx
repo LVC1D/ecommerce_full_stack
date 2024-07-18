@@ -5,6 +5,7 @@ import { addToCart, fetchCartByIds } from "../features/cartSlice";
 import { selectSearchTerm } from "../features/searchSlice";
 import { Link } from "react-router-dom";
 import ROUTES from "../routes";
+import './Products.css';
 
 function Products() {
   const products = useSelector(selectProducts);
@@ -29,9 +30,13 @@ function Products() {
       console.error("Failed to add to cart:", error);
     }
   };
+
+  if (!Array.isArray(products)) {
+    return null;
+  }
   
   return (
-    <div>
+    <div className="products">
       <h1>Super Awesome eCommerce site!</h1>
       <ul className="products-grid">
         {products && products.map(product => (

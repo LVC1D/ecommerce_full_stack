@@ -1,5 +1,6 @@
 const express = require('express');
 const userRouter = express.Router();
+const {body, validationResult} = require('express-validator');
 
 module.exports = (pool, ensureAuthenticated) => {
     
@@ -29,7 +30,15 @@ module.exports = (pool, ensureAuthenticated) => {
             });
         });
 
-        userRouter.put('/:id', ensureAuthenticated, async (req, res) => {
+        userRouter.put('/:id', ensureAuthenticated, [
+            body('username').isString().isLength({ min: 3 }).trim().escape(),
+            body('address').isString().isLength({ min: 6 }).trim().escape().blacklist("'\"`;\\/\\#%")
+        ], async (req, res) => {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(400).json({ message: errors.array() });
+            }
+            
             const userId = req.params.id;
             const { username, address } = req.body;
             await pool.query('UPDATE users SET username = $1, address = $2 WHERE id = $3', [username, address, userId], (err, result) => {

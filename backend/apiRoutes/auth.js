@@ -10,6 +10,7 @@ require('dotenv').config();
 const store = new session.MemoryStore();
 const {pool} = require('../model/database');
 const crypto = require('crypto-js');
+const {body} = require('express-validator');
 
 passport.use(new LocalStrategy(async function verify(username, password, done) {
     try {
@@ -128,7 +129,14 @@ passport.deserializeUser(async (id, done) => {
     }
 });
 
-authRouter.post('/register', async (req, res, next) => {
+authRouter.post('/register', [
+    body('email').isEmail(),
+    body('name').isString().isLength({ min: 3 }).blacklist("'\"`;\\/\\#%"),
+    body('username').isString().isLength({ min: 3 }),
+    body('password').isString().isLength({ min: 3 }).blacklist("'\"`;\\/\\#%"),
+    body('address').isString().isLength({ min: 6 }).blacklist("'\"`;\\/\\#%")
+
+], async (req, res, next) => {
     try {
         const { email, name, username, password, address } = req.body;
 
@@ -158,7 +166,10 @@ authRouter.post('/register', async (req, res, next) => {
     }
 });
 
-authRouter.post('/login', (req, res, next) => {
+authRouter.post('/login', [
+    body('username').isString().isLength({ min: 3 }),
+    body('password').isString().isLength({ min: 3 }).blacklist("'\"`;\\/\\#%")
+], (req, res, next) => {
     passport.authenticate('local', (err, user, info) => {
         if (err) {
             return next(err);

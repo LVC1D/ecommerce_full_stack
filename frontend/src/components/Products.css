@@ -1,0 +1,38 @@
+/* Products */
+
+.products {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding: 2rem;
+  }
+  
+  ul.products-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 columns */
+    gap: 20px; /* Space between grid items */
+    list-style: none; /* Remove list style */
+    padding: 0; /* Remove default padding */
+    margin: 0; /* Remove default margin */
+  }
+  
+  /* Individual product items */
+  ul.products-grid li {
+    border: 1px solid #ccc; /* Tiny border around each item */
+    padding: 15px; /* Padding around each item */ 
+    border-radius: 5px;
+    max-width: 24rem; /* Optional: rounded corners */
+  }
+  
+  /* Links inside the product items */
+  ul.products-grid li a {
+    text-decoration: none; /* Remove link underline */
+    color: inherit; /* Inherit text color */
+  }
+  
+  /* Product item hover effect */
+  ul.products-grid li:hover {
+    border-color: #888; /* Darken the border on hover */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Optional: subtle shadow on hover */
+  }

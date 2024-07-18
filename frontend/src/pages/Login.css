@@ -1,0 +1,73 @@
+.login-form {
+    display: flex;
+    width: 100vw; /* Ensure it takes the full viewport width */
+    height: 100vh; /* Ensure it takes the full viewport height */
+}
+
+.login-banner {
+    background: url('../assets/cardboard_white_table.jpg');
+    background-position: center;
+    background-size: cover;
+    flex: 1; /* Takes half of the space because of flexbox */
+    width: auto; /* Ensure it takes half of the width */
+    height: 100%; /* Ensure it takes full height */
+    font-weight: bold;
+    margin: 0; /* Remove margin to use full space */
+    align-content: center;
+}
+
+.login-fields {
+    flex: 0.5; /* Takes the remaining half of the space */
+    width: auto; /* Ensure it takes half of the width */
+    height: auto; /* Ensure it takes full height */
+    padding: 5rem; /* Add some padding for inner spacing */
+    display: flex;
+    border: solid 1px #fff;
+    flex-direction: column; /* Arrange children in a column */
+    justify-content: center; /* Center content vertically */
+    align-items: flex-start; /* Center content horizontally */
+}
+
+#login {
+    width: 52%;
+    text-align: center;
+    font-size: 1rem;
+    margin: 0 auto;
+}
+
+.login-form input {
+    width: 250px;
+    padding: 10px;
+    margin: 25px auto;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    display: block;
+}
+
+.sso {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin: 0 auto;
+    width: 320px;
+}
+
+.sso-buttons {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+
+}
+
+.sso-buttons button {
+    justify-self: stretch;
+    width: 100px;
+    padding: 10px;
+    margin: 10px;
+   
+    background-color: #fff;
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+}

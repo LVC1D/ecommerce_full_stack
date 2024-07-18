@@ -12,6 +12,7 @@ const partials = require('express-partials');
 const flash = require('connect-flash');
 const { ensureAuthenticated, calculateSubtotal, incrementItemCount } = require('./helpers');
 require('dotenv').config();
+const csrf = require('csurf');
 const {pool} = require('./model/database');
 const {authRouter, initAuth} = require('./apiRoutes/auth');
 const productRouter = require('./apiRoutes/products')(pool);
@@ -40,6 +41,20 @@ app.use(flash());
 
 // initialized AFTER the body-parsing, cors-ing and json-ifying middleware
 initAuth(app);
+
+app.use(csrf());
+
+app.use((req, res, next) => {
+    const csrfToken = req.csrfToken();
+    res.cookie('XSRF-TOKEN', csrfToken, {
+        secure: process.env.NODE_ENV === 'production', //true
+        httpOnly: false,
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax' //'none'
+    });
+    res.locals.csrfToken = csrfToken;
+    console.log('CSRF token:', csrfToken);
+    next();
+});
 
 app.use('/api/auth', authRouter);
 app.use('/products', productRouter);

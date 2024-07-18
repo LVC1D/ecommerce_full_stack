@@ -58,7 +58,16 @@ function Header() {
                         isVisible={userTooltipVisibility}
                     >
                     </UserTooltip>
-                    <button onClick={handleLogout}>Logout</button>
+                    <Link to={ROUTES.PROFILE(user?.id)}>
+                        <img src="../src/assets/User_32.png" alt="User Logo" />
+                    </Link>
+                    <Link to={ROUTES.CART(cart?.id)}>
+                        <div className='count-container'>
+                            <img src="../src/assets/Cart_32.png" alt="Cart Logo" />
+                            <span id="count">{cart?.item_count || 0}</span>
+                        </div>
+                    </Link>
+                    <button onClick={handleLogout}>Log Out</button>
                 </div>
             ) : (
                 <div>

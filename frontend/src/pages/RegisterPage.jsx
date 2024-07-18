@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import ROUTES from '../routes';
 import * as Yup from 'yup';
+import './Register.css';
 
 const validationSchema = Yup.object().shape({
   username: Yup.string().required('Username is required'),
@@ -47,29 +48,34 @@ const RegisterPage = () => {
       }}
     >
       {({ isSubmitting }) => (
-        <Form>
-          <Field type="text" name="username" placeholder="Username" />
-          <ErrorMessage name="username" component="div" />
+        <div className='register-form'>
+          <div className='banner'>
+            <h1>Register here</h1>
+          </div>
+          <Form className='fields'>
+            <Field className="input" type="text" name="username" placeholder="Username" />
+            <ErrorMessage name="username" component="div" />
 
-          <Field type="password" name="password" placeholder="Password" />
-          <ErrorMessage name="password" component="div" />
+            <Field type="password" name="password" placeholder="Password" />
+            <ErrorMessage name="password" component="div" />
 
-          <Field type="email" name="email" placeholder="Email" />
-          <ErrorMessage name="email" component="div" />
+            <Field type="email" name="email" placeholder="Email" />
+            <ErrorMessage name="email" component="div" />
 
-          <Field type="text" name="name" placeholder="Name" />
-          <ErrorMessage name="name" component="div" />
+            <Field type="text" name="name" placeholder="Name" />
+            <ErrorMessage name="name" component="div" />
 
-          <Field type="text" name="address" placeholder="Address" />
-          <ErrorMessage name="address" component="div" />
+            <Field type="text" name="address" placeholder="Address" />
+            <ErrorMessage name="address" component="div" />
 
-          <button type="submit" disabled={isSubmitting}>
-            Register
-          </button>
-          {/* Login button can be added similarly */}
-          {status === 'loading' && <p>Loading...</p>}
-          {error && <p>{error}</p>}
-        </Form>
+            <button id='register' type="submit" disabled={isSubmitting}>
+              Register
+            </button>
+            {/* Login button can be added similarly */}
+            {status === 'loading' && <p>Loading...</p>}
+            {error && <p>{error}</p>}
+          </Form>
+        </div>
       )}
     </Formik>
   );

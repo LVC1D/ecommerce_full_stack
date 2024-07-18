@@ -24,8 +24,8 @@ export const fetchUserById = createAsyncThunk(
 export const updateUser = createAsyncThunk(
     'user/updateUser',
     async ({ userId, username, address }, { rejectWithValue }) => {
-        if (!userId) {
-            return rejectWithValue('Invalid userId');
+        if (!userId || !username || !address) {
+            return rejectWithValue('Invalid input');
         }
 
         try {

@@ -5,6 +5,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import ROUTES from '../routes';
 import {useNavigate} from 'react-router-dom';
 import * as Yup from 'yup';
+import './Login.css';
 
 const validationSchema = Yup.object().shape({
   username: Yup.string().required('Username is required'),
@@ -42,7 +43,6 @@ const LoginPage = () => {
 
   return (
     <div>
-      <h2>Login</h2>
       <Formik
         initialValues={initialValues}
         validationSchema={validationSchema}
@@ -53,26 +53,35 @@ const LoginPage = () => {
         }}
       >
       {({ isSubmitting }) => (
-        <Form>
-          <Field type="text" name="username" placeholder="Username" />
-            <ErrorMessage name="username" component="div" />
+        <div className='login-form'>
+          <div className='login-banner'>
+            <h1>Login here</h1>
+          </div>
+          <Form className='login-fields'>
+            <Field className='input' type="text" name="username" placeholder="Username" />
+              <ErrorMessage name="username" component="div" />
 
-            <Field type="password" name="password" placeholder="Password" />
-            <ErrorMessage name="password" component="div" />
+              <Field type="password" name="password" placeholder="Password" />
+              <ErrorMessage name="password" component="div" />
 
-            <button type="submit" disabled={isSubmitting}>
-              Login
-            </button>
-            <h2>Or login via SSO</h2>
-            <button type="submit" onClick={handleGoogleLogin}>
-              Google
-            </button>
-            <button type="submit" onClick={handleFacebookLogin}>
-              Facebook
-            </button>
-            {status === 'loading' && <p>Loading...</p>}
-            {error && <p>{error}</p>}
-          </Form>
+              <button id='login' type="submit" disabled={isSubmitting}>
+                Login
+              </button>
+              <div className='sso'>
+                <h2>Or login via SSO</h2>
+                  <div className='sso-buttons'>
+                    <button type="submit" onClick={handleGoogleLogin}>
+                      Google
+                    </button>
+                    <button type="submit" onClick={handleFacebookLogin}>
+                      Facebook
+                    </button>
+                  </div>
+              </div>
+              {status === 'loading' && <p>Loading...</p>}
+              {error && <p>{error}</p>}
+            </Form>
+        </div>
         )}
       </Formik>
     </div>

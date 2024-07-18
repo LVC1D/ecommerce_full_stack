@@ -62,8 +62,7 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    setUser: (state, action) => {
-      state.user = action.payload;
+    setUser: (state) => {
       state.isAuth = true;
     },
     logoutUser: (state) => {
@@ -109,7 +108,7 @@ const authSlice = createSlice({
       .addCase(checkLoginStatus.fulfilled, (state, action) => {
         state.status = 'succeeded';
         state.user = action.payload.user;
-        state.isAuth = action.payload.isAuth || true || false;
+        state.isAuth = action.payload.isAuth;
       })
       .addCase(checkLoginStatus.rejected, (state, action) => {
         state.status = 'failed';

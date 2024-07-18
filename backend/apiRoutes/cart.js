@@ -127,8 +127,8 @@ module.exports = (pool, ensureAuthenticated, calculateSubtotal, incrementItemCou
                 await pool.query('BEGIN');
         
                 for (const item of items) {
-                    const {productId, quantity} = item;
-                    console.log('Updating item:', productId, 'with quantity:', quantity);
+                    const {product_id, quantity} = item;
+                    console.log('Updating item:', product_id, 'with quantity:', quantity);
                     if (isNaN(quantity) || quantity < 0) {
                         res.status(400).json({ message: "Invalid quantity" });
                         return;

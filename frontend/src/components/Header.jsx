@@ -45,14 +45,6 @@ function Header() {
                                 <button>
                                     <Link to={ROUTES.ORDERS}>My orders</Link>
                                 </button>
-                                <button>
-                                    <Link to={ROUTES.CART(cart?.id)}>
-                                        Cart ({cart?.item_count || 0})
-                                    </Link>
-                                </button>
-                                <button>
-                                    <Link to={ROUTES.PROFILE(user?.id)}>My profile</Link>
-                                </button>
                             </div>
                         }
                         isVisible={userTooltipVisibility}

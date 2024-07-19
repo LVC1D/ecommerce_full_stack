@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { fetchCartItems, updateCart, removeFromCart, makePayment } from "../features/cartItemSlice";
 import { fetchCartByIds } from "../features/cartSlice";
+import './CartItems.css';
 
 export default function CartItems() {
     const dispatch = useDispatch();
@@ -58,28 +59,30 @@ export default function CartItems() {
     }
 
     return (
-        <div>
+        <div className="cart-container">
             <h1>Cart Items</h1>
-            <ul>
+            <ul className="cart-items-list">
                 {localCartItems.length > 0 ? localCartItems.map((item) => (
-                    <li key={item.product_id}>
+                    <li key={item.product_id} className="cart-item">
                         <p>Price: ${item.product_price}</p>
                         <p>Quantity: {item.quantity}</p>
-                        <button onClick={() => handleQuantityChange(item.product_id, item.quantity + 1)}>+</button>
-                        <button onClick={() => handleQuantityChange(item.product_id, item.quantity - 1)}>-</button>
+                        <span onClick={() => handleQuantityChange(item.product_id, item.quantity + 1)}>+</span>
+                        <span onClick={() => handleQuantityChange(item.product_id, item.quantity - 1)}>-</span>
                         <input type='number' value={item.quantity} onChange={(e) => handleQuantityChange(item.product_id, e.target.value)} />
-                        <button onClick={() => handleRemove(item.product_id)}>
-                            Remove
-                        </button>
+                        <span onClick={() => handleRemove(item.product_id)}>
+                            <img src="../src/assets/Trash_24.png" />
+                        </span>
                     </li>
                 )) : <p>Your cart is empty.</p>}
             </ul>
-            <button onClick={handleUpdate}>
-                Update cart
-            </button>
-            <button onClick={handlePayment}>
-                Proceed to checkout
-            </button>
+            <div className="cart-actions">
+                <button onClick={handleUpdate}>
+                    Update cart
+                </button>
+                <button onClick={handlePayment}>
+                    Proceed to checkout
+                </button>
+            </div>
         </div>
     );
 }

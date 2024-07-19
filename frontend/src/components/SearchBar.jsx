@@ -27,7 +27,7 @@ function SearchBar() {
             <div id="search-container">
                 <input
                     type="text" 
-                    placeholder="Search posts..."
+                    placeholder="Search products..."
                     value={searchTerm}
                     onChange={handleSearchResults}
                     className="search-input" />

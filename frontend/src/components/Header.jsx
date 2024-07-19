@@ -55,7 +55,7 @@ function Header() {
                     </Link>
                     <Link to={ROUTES.CART(cart?.id)}>
                         <div className='count-container'>
-                            <img src="../src/assets/Cart_32.png" alt="Cart Logo" />
+                            <span><img src="../src/assets/Cart_32.png" alt="Cart Logo" /></span>
                             <span id="count">{cart?.item_count || 0}</span>
                         </div>
                     </Link>

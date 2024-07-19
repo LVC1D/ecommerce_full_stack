@@ -99,9 +99,10 @@ button:focus-visible {
   background-color: #ed2020;
   border-radius: 50%;
   color: #f9f9f9;
+  font-size: 0.8rem;
   width: 15px;
   height: 15px;
-  padding: 0.07rem 0.32rem 0.07rem;
+  padding: 0.07rem 0.28rem 0.07rem;
   position: relative;
   top: -1.1rem;
   left: 0.25rem;

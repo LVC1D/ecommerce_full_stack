@@ -11,6 +11,7 @@ const store = new session.MemoryStore();
 const {pool} = require('../model/database');
 const crypto = require('crypto-js');
 const {body} = require('express-validator');
+const csrfProtection = require('../csrfConfig');
 
 passport.use(new LocalStrategy(async function verify(username, password, done) {
     try {
@@ -129,7 +130,7 @@ passport.deserializeUser(async (id, done) => {
     }
 });
 
-authRouter.post('/register', [
+authRouter.post('/register', csrfProtection, [
     body('email').isEmail(),
     body('name').isString().isLength({ min: 3 }).blacklist("'\"`;\\/\\#%"),
     body('username').isString().isLength({ min: 3 }),
@@ -166,7 +167,7 @@ authRouter.post('/register', [
     }
 });
 
-authRouter.post('/login', [
+authRouter.post('/login', csrfProtection, [
     body('username').isString().isLength({ min: 3 }),
     body('password').isString().isLength({ min: 3 }).blacklist("'\"`;\\/\\#%")
 ], (req, res, next) => {
@@ -186,7 +187,7 @@ authRouter.post('/login', [
     })(req, res, next);
 });
 
-authRouter.get('/is_logged_in', (req, res) => {
+authRouter.get('/is_logged_in', csrfProtection, (req, res) => {
     if (req.isAuthenticated()) {
         return res.json({ user: req.user });
     } else {
@@ -194,27 +195,29 @@ authRouter.get('/is_logged_in', (req, res) => {
     }
 });
 
-authRouter.get('/google', passport.authenticate('google', 
+authRouter.get('/google', csrfProtection, passport.authenticate('google', 
     { scope: ['profile', 'email'] }));
     
 
-authRouter.get('/google/callback', 
+authRouter.get('/google/callback', csrfProtection, 
     passport.authenticate('google', { 
         failureRedirect: '/login',
         failureMessage: "Failed to authenticate. Try again.",
     }), (req, res) => {
+        
         console.log('Google login successful, user:', req.user);
         res.redirect('/');
     }
 );
 
-authRouter.get('/facebook', passport.authenticate('facebook', { scope: ['email', 'public_profile'] }));
+authRouter.get('/facebook', csrfProtection, passport.authenticate('facebook', { scope: ['email', 'public_profile'] }));
 
-authRouter.get('/facebook/callback', 
+authRouter.get('/facebook/callback', csrfProtection, 
     passport.authenticate('facebook', { 
         failureRedirect: '/login',
         failureMessage: "Failed to authenticate. Try again.",
     }), (req, res) => {
+        
         console.log('Facebook login successful, user:', req.user);
         res.redirect('/');
     }

@@ -1,9 +1,10 @@
 const express = require('express');
 const orderRouter = express.Router();
+const csrfProtection = require('../csrfConfig');
 
 module.exports = (pool, ensureAuthenticated) => {
 
-    orderRouter.get('/', ensureAuthenticated, async (req, res) => {
+    orderRouter.get('/', ensureAuthenticated, csrfProtection, async (req, res) => {
         const userId = parseInt(req.query.userId);
         if (isNaN(userId)) {
             res.status(400).json({ message: "Invalid user ID" });
@@ -20,7 +21,7 @@ module.exports = (pool, ensureAuthenticated) => {
         });
     });
     
-    orderRouter.get('/:id', ensureAuthenticated, async (req, res) => {
+    orderRouter.get('/:id', ensureAuthenticated, csrfProtection, async (req, res) => {
         const orderId = parseInt(req.params.id);
         const userId = parseInt(req.query.userId);
         await pool.query('SELECT * FROM orders WHERE id = $1 AND user_id = $2', [orderId, userId], (err, result) => {

@@ -20,6 +20,11 @@ function Products() {
   }, [dispatch, searchTerm]);
 
   const handleAddToCart = async (productId) => {
+    const product = products.find(product => product.id === productId);
+    if (product.quantity === 0) {
+      return <p>Out of stock!</p>;
+    }
+    
     try {
       if (user && isAuth) {
         await dispatch(addToCart({ cartId: cart.id, productId })).unwrap();
@@ -45,7 +50,7 @@ function Products() {
                 <h2>{product.name}</h2>
                 <p>{product.category}</p>
                 <p>${product.price}</p>
-                <p>Available in stock: {product.quantity}</p>
+                {product.quantity === 0 ? <p className="out">Out of stock!</p> : <p className="instock">In stock</p>}
               </Link>
               {cart ? <button onClick={() => handleAddToCart(product.id)}>Add to Cart</button> : <button>Add to Cart</button>}
           </li>

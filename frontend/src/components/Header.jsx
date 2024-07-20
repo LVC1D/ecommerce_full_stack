@@ -4,23 +4,37 @@ import ROUTES from '../routes';
 import { useSelector, useDispatch } from 'react-redux';
 import { logoutUser, checkLoginStatus } from '../features/authSlice';
 import { fetchCartByIds, createCart } from '../features/cartSlice';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import UserTooltip from './UserTooltip';
 import {selectUserTooltipVisibility, toggleTooltip} from '../features/userTooltipSlice';
+import CartItems from '../pages/CartItems';
 
 function Header() {
     const { user, isAuth } = useSelector((state) => state.auth);
     const { cart } = useSelector((state) => state.cart);
     const userTooltipVisibility = useSelector(selectUserTooltipVisibility);
     const dispatch = useDispatch();
+    const [isCartModalVisible, setCartModalVisible] = useState(false);
+
+    // useEffect(() => {
+    //     dispatch(fetchCartByIds(user?.id));
+    // }, [dispatch, isAuth, user]);
+
+    // useEffect(() => {
+    //     dispatch(createCart(user?.id));
+    // }, [dispatch, user]);
 
     useEffect(() => {
-        dispatch(fetchCartByIds(user?.id));
-    }, [dispatch, user]);
-
+        if (isAuth && user) {
+            dispatch(fetchCartByIds(user.id));
+        }
+    }, [dispatch, isAuth, user]);
+    
     useEffect(() => {
-        dispatch(createCart(user?.id));
-    }, [dispatch, user]);
+        if (isAuth && user) {
+            dispatch(createCart(user.id));
+        }
+    }, [dispatch, isAuth, user]);
 
     const handleLogout = () => {
         dispatch(logoutUser());
@@ -29,6 +43,12 @@ function Header() {
     const handleUserTooltip = () => {
         dispatch(toggleTooltip());
     };
+
+    const toggleCartModal = () => {
+        setCartModalVisible(!isCartModalVisible);
+    };
+
+    // console.log('Is auth:', isAuth);
 
     return (
         <div className='nav-bar'>
@@ -53,12 +73,12 @@ function Header() {
                     <Link to={ROUTES.PROFILE(user?.id)}>
                         <img src="../src/assets/User_32.png" alt="User Logo" />
                     </Link>
-                    <Link to={ROUTES.CART(cart?.id)}>
-                        <div className='count-container'>
-                            <span><img src="../src/assets/Cart_32.png" alt="Cart Logo" /></span>
-                            <span id="count">{cart?.item_count || 0}</span>
-                        </div>
-                    </Link>
+                    
+                    <div className='count-container' onClick={toggleCartModal} style={{ cursor: 'pointer' }} >
+                        <span><img src="../src/assets/Cart_32.png" alt="Cart Logo" /></span>
+                        <span id="count">{cart?.item_count || 0}</span>
+                    </div>
+                    {isCartModalVisible && <CartItems isVisible={isCartModalVisible} onClose={toggleCartModal} />}
                     <button onClick={handleLogout}>Log Out</button>
                 </div>
             ) : (

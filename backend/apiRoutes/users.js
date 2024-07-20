@@ -1,10 +1,11 @@
 const express = require('express');
 const userRouter = express.Router();
 const {body, validationResult} = require('express-validator');
+const csrfProtection = require('../csrfConfig');
 
 module.exports = (pool, ensureAuthenticated) => {
     
-        userRouter.get('/', ensureAuthenticated, async (req, res) => {
+        userRouter.get('/', ensureAuthenticated, csrfProtection, async (req, res) => {
     
             await pool.query('SELECT * FROM users', (err, result) => {
                 if (err) {
@@ -16,7 +17,7 @@ module.exports = (pool, ensureAuthenticated) => {
             });
         });
         
-        userRouter.get('/:id', ensureAuthenticated, async (req, res) => {
+        userRouter.get('/:id', ensureAuthenticated, csrfProtection, async (req, res) => {
             const userId = req.params.id;
             await pool.query('SELECT * FROM users WHERE id = $1', [userId], (err, result) => {
                 if (err) {
@@ -30,7 +31,7 @@ module.exports = (pool, ensureAuthenticated) => {
             });
         });
 
-        userRouter.put('/:id', ensureAuthenticated, [
+        userRouter.put('/:id', ensureAuthenticated, csrfProtection, [
             body('username').isString().isLength({ min: 3 }).trim().escape(),
             body('address').isString().isLength({ min: 6 }).trim().escape().blacklist("'\"`;\\/\\#%")
         ], async (req, res) => {

@@ -23,7 +23,7 @@ const router = createBrowserRouter(createRoutesFromElements(
       <Route path={ROUTES.REGISTER} element={<RegisterPage/>}/>
       <Route path={ROUTES.ORDERS} element={<Orders/>}/>
       <Route path={ROUTES.PROFILE(':userId')} element={<UserProfile/>} />
-      <Route path={ROUTES.CART(':cartId')} element={<CartItems/>}/>
+      {/* <Route path={ROUTES.CART(':cartId')} element={<CartItems/>}/> */}
       <Route path={ROUTES.SUCCESS} element={<Success/>}/>
       <Route path={ROUTES.CANCEL} element={<Cancel/>}/>
     </Route>

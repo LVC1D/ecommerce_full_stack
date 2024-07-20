@@ -12,13 +12,13 @@ const partials = require('express-partials');
 const flash = require('connect-flash');
 const { ensureAuthenticated, calculateSubtotal, incrementItemCount } = require('./helpers');
 require('dotenv').config();
-const csrf = require('csurf');
 const {pool} = require('./model/database');
 const {authRouter, initAuth} = require('./apiRoutes/auth');
 const productRouter = require('./apiRoutes/products')(pool);
 const orderRouter = require('./apiRoutes/orders')(pool, ensureAuthenticated);
 const userRouter = require('./apiRoutes/users')(pool, ensureAuthenticated);
 const cartRouter = require('./apiRoutes/cart')(pool, ensureAuthenticated, calculateSubtotal, incrementItemCount);
+const csrfProtection = require('./csrfConfig');
 
 const sslOptions = {
     key: fs.readFileSync(path.join(__dirname, 'certs', 'myapp.local-key.pem')),
@@ -42,7 +42,7 @@ app.use(flash());
 // initialized AFTER the body-parsing, cors-ing and json-ifying middleware
 initAuth(app);
 
-app.use(csrf());
+app.use(csrfProtection);
 
 app.use((req, res, next) => {
     const csrfToken = req.csrfToken();
@@ -68,6 +68,9 @@ app.get('*', (req, res) => {
 });
 
 app.use((err, req, res, next) => {
+    if (err.code === 'EBADCSRFTOKEN') {
+        return res.status(403).json({ message: 'Invalid CSRF token' });
+    }
     console.error(err.stack);
     res.status(500).json({ message: "Internal Server Error" });
 });

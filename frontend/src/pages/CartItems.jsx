@@ -6,8 +6,10 @@ import './CartItems.css';
 import trashImage from "../assets/Trash-32.png";
 import plusIcon from '../assets/Plus_light.png';
 import minusIcon from '../assets/Minus_24.png';
+import CartModal from "../components/CartModal";
+import PropTypes from 'prop-types';
 
-export default function CartItems() {
+export default function CartItems( {isVisible, onClose} ) {
     const dispatch = useDispatch();
     const { cart } = useSelector((state) => state.cart);
     const { loading, error } = useSelector((state) => state.cartItems);
@@ -62,30 +64,46 @@ export default function CartItems() {
     }
 
     return (
-        <div className="cart-container">
-            <h1>Cart Items</h1>
-            <ul className="cart-items-list">
-                {localCartItems.length > 0 ? localCartItems.map((item) => (
-                    <li key={item.product_id} className="cart-item">
-                        <p>Price: ${item.product_price}</p>
-                        <p>Quantity: {item.quantity}</p>
-                        <span onClick={() => handleQuantityChange(item.product_id, item.quantity + 1)}><img src={plusIcon}/></span>
-                        <span onClick={() => handleQuantityChange(item.product_id, item.quantity - 1)}><img src={minusIcon}/></span>
-                        <input type='number' value={item.quantity} onChange={(e) => handleQuantityChange(item.product_id, e.target.value)} />
-                        <span onClick={() => handleRemove(item.product_id)}>
-                            <img src={trashImage} />
-                        </span>
-                    </li>
-                )) : <p>Your cart is empty.</p>}
-            </ul>
-            <div className="cart-actions">
-                <button onClick={handleUpdate}>
-                    Update cart
-                </button>
-                <button onClick={handlePayment}>
-                    Proceed to checkout
-                </button>
+        <CartModal onClose={onClose} isVisible={isVisible}>
+            <div className="cart-container">
+                <h1>Cart Items</h1>
+                <ul className="cart-items-list">
+                    {localCartItems.length > 0 ? localCartItems.map((item) => (
+                        <li key={item.product_id} className="cart-item">
+                            <div className="item-header">
+                                <p>{item.name}: ${item.product_price} each</p>
+                                <p>Quantity: {item.quantity}</p>
+                                <p>Category: {item.category}</p>
+                            </div>
+                            
+                            <div className="item-body">
+                                <div className="item-counter">
+                                    <span onClick={() => handleQuantityChange(item.product_id, item.quantity - 1)}><img src={minusIcon}/></span>
+                                    <input type='number' value={item.quantity} onChange={(e) => handleQuantityChange(item.product_id, e.target.value)} />
+                                    <span onClick={() => handleQuantityChange(item.product_id, item.quantity + 1)}><img src={plusIcon}/></span>
+                                </div>
+                                <span onClick={() => handleRemove(item.product_id)}>
+                                    <img src={trashImage} />
+                                </span>
+                            </div>
+                        </li>
+                    )) : <p>Your cart is empty.</p>}
+                </ul>
+                <p>Subtotal: ${cart.sub_total}</p>
+                <div className="cart-actions">
+                    <button onClick={handleUpdate}>
+                        Update cart
+                    </button>
+                    <button onClick={handlePayment}>
+                        Proceed to checkout
+                    </button>
+                </div>
             </div>
-        </div>
+        </CartModal>
     );
 }
+
+CartItems.propTypes = {
+    isVisible: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired
+};

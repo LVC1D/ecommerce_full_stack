@@ -2,10 +2,11 @@ const express = require('express');
 const cartRouter = express.Router();
 const stripe = require('stripe')(process.env.STRIPE_CLIENT_SECRET);
 require('dotenv').config();
+const csrfProtection = require('../csrfConfig');
 
 module.exports = (pool, ensureAuthenticated, calculateSubtotal, incrementItemCount) => {
     
-        cartRouter.get('/', ensureAuthenticated, async (req, res) => {
+        cartRouter.get('/', ensureAuthenticated, csrfProtection, async (req, res) => {
             const userId = parseInt(req.query.userId, 10);
 
             if (isNaN(userId)) {
@@ -24,7 +25,7 @@ module.exports = (pool, ensureAuthenticated, calculateSubtotal, incrementItemCou
             });
         });
 
-        cartRouter.get('/:id/items', ensureAuthenticated, async (req, res) => {
+        cartRouter.get('/:id/items', ensureAuthenticated, csrfProtection, async (req, res) => {
             const cartId = req.params.id;
 
             if (!cartId) {
@@ -32,7 +33,15 @@ module.exports = (pool, ensureAuthenticated, calculateSubtotal, incrementItemCou
                 return;
             }
 
-            await pool.query('SELECT * FROM cart_items WHERE cart_id = $1', [cartId], (err, result) => {
+            await pool.query(`
+                SELECT cart_items.product_id, 
+                cart_items.quantity, cart_items.cart_id, 
+                cart_items.product_price, products.name, 
+                products.category
+                FROM cart_items
+                LEFT JOIN products
+	                ON cart_items.product_id = products.id
+                WHERE cart_items.cart_id = $1`, [cartId], (err, result) => {
                 if (err) {
                     console.error("Error getting cart items:", err);
                     res.status(500).json({ message: err.message });
@@ -42,7 +51,7 @@ module.exports = (pool, ensureAuthenticated, calculateSubtotal, incrementItemCou
             });
         })
 
-        cartRouter.post('/', ensureAuthenticated, async (req, res) => {
+        cartRouter.post('/', ensureAuthenticated, csrfProtection, async (req, res) => {
             const userId = parseInt(req.query.userId, 10);
 
             if (isNaN(userId)) {
@@ -67,7 +76,7 @@ module.exports = (pool, ensureAuthenticated, calculateSubtotal, incrementItemCou
             });
         });
 
-        cartRouter.post('/:id', ensureAuthenticated, async (req, res) => {
+        cartRouter.post('/:id', ensureAuthenticated, csrfProtection, async (req, res) => {
             const cartId = req.params.id;
             const { productId } = req.body;
     
@@ -110,7 +119,7 @@ module.exports = (pool, ensureAuthenticated, calculateSubtotal, incrementItemCou
             }
         });
 
-        cartRouter.put('/:id', ensureAuthenticated, async (req, res) => {
+        cartRouter.put('/:id', ensureAuthenticated, csrfProtection, async (req, res) => {
             const cartId = req.params.id;
             const { items } = req.body;
 
@@ -160,7 +169,7 @@ module.exports = (pool, ensureAuthenticated, calculateSubtotal, incrementItemCou
             }
         });
 
-        cartRouter.delete('/:id', ensureAuthenticated, async (req, res) => {
+        cartRouter.delete('/:id', ensureAuthenticated, csrfProtection, async (req, res) => {
             const cartId = req.params.id;
 
             if (!cartId) {
@@ -185,7 +194,7 @@ module.exports = (pool, ensureAuthenticated, calculateSubtotal, incrementItemCou
             });
         });
 
-        cartRouter.delete('/:id/items/:productId', ensureAuthenticated, async (req, res) => {
+        cartRouter.delete('/:id/items/:productId', ensureAuthenticated, csrfProtection, async (req, res) => {
             const cartId = req.params.id;
             const productId = req.params.productId;
 
@@ -217,16 +226,24 @@ module.exports = (pool, ensureAuthenticated, calculateSubtotal, incrementItemCou
             });
         })
 
-        cartRouter.post('/:id/create-checkout', ensureAuthenticated, async (req, res) => {
+        cartRouter.post('/:id/create-checkout', ensureAuthenticated, csrfProtection, async (req, res) => {
             const cartId = req.params.id;
             // handle the Stripe-enabled payment gateway
-            const cartItemsResult = await pool.query('SELECT * FROM cart_items WHERE cart_id = $1', [cartId]);
+            const cartItemsResult = await pool.query(`
+                SELECT cart_items.product_id, 
+                cart_items.quantity, cart_items.cart_id, 
+                cart_items.product_price, products.name, 
+                products.category
+                FROM cart_items
+                LEFT JOIN products
+	                ON cart_items.product_id = products.id
+                WHERE cart_items.cart_id = $1`, [cartId]);
             const lineItems = cartItemsResult.rows.map((item) => {
                 return {
                     price_data: {
                         currency: 'usd',
                         product_data: {
-                            name: item.product_id.toString(),
+                            name: item.name,
                         },
                         unit_amount: Math.round(item.product_price * 100),
                     },
@@ -245,7 +262,7 @@ module.exports = (pool, ensureAuthenticated, calculateSubtotal, incrementItemCou
         })
 
         // to create a checkout router
-        cartRouter.post('/:id/checkout', ensureAuthenticated, async (req, res) => {
+        cartRouter.post('/:id/checkout', ensureAuthenticated, csrfProtection, async (req, res) => {
             // declare the params and the request body
             const cartId = req.params.id;
             let {userId, orderSum} = req.body;

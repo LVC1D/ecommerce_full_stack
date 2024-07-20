@@ -85,7 +85,8 @@ button:focus-visible {
   display: flex;
   justify-content: space-between;
   align-items: center; 
-  width: 24%;
+  width: 30%;
+  max-width: 525px;
 }
 
 /* main */

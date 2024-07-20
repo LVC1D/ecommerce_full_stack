@@ -13,25 +13,24 @@ export default function Success() {
     const [orderCreated, setOrderCreated] = useState(false);
 
     useEffect(() => {
-        if (cart && user && !orderCreated) {
+        if (cart && user && cart.item_count > 0 && !orderCreated) {
             dispatch(createOrder({
-                cartId: cart?.id,
-                userId: user?.id,
+                cartId: cart.id,
+                userId: user.id,
                 orderSum: cart.sub_total
             }))
             .then(() => {
-                setOrderCreated(true);
-                dispatch(createCart(user?.id)).then(() => {
-                    dispatch(fetchCartByIds(user?.id));
-                    dispatch(fetchCartItems(cart?.id));
+                dispatch(createCart(user.id)).then(() => {
+                    dispatch(fetchCartByIds(user.id));
                 });
-            });
+            })
+            setOrderCreated(true)
         }
-    }, [cart, dispatch, user, orderCreated]);
-
+    }, [cart, dispatch, orderCreated, user]);
+    
     useEffect(() => {
         dispatch(setUser(isAuth));
-    }, [isAuth, dispatch])
+    }, [isAuth, dispatch]);
 
     return (
         <div>

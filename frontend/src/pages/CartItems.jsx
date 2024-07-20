@@ -3,6 +3,9 @@ import { useEffect, useState } from "react";
 import { fetchCartItems, updateCart, removeFromCart, makePayment } from "../features/cartItemSlice";
 import { fetchCartByIds } from "../features/cartSlice";
 import './CartItems.css';
+import trashImage from "../assets/Trash-32.png";
+import plusIcon from '../assets/Plus_light.png';
+import minusIcon from '../assets/Minus_24.png';
 
 export default function CartItems() {
     const dispatch = useDispatch();
@@ -66,11 +69,11 @@ export default function CartItems() {
                     <li key={item.product_id} className="cart-item">
                         <p>Price: ${item.product_price}</p>
                         <p>Quantity: {item.quantity}</p>
-                        <span onClick={() => handleQuantityChange(item.product_id, item.quantity + 1)}>+</span>
-                        <span onClick={() => handleQuantityChange(item.product_id, item.quantity - 1)}>-</span>
+                        <span onClick={() => handleQuantityChange(item.product_id, item.quantity + 1)}><img src={plusIcon}/></span>
+                        <span onClick={() => handleQuantityChange(item.product_id, item.quantity - 1)}><img src={minusIcon}/></span>
                         <input type='number' value={item.quantity} onChange={(e) => handleQuantityChange(item.product_id, e.target.value)} />
                         <span onClick={() => handleRemove(item.product_id)}>
-                            <img src="../src/assets/Trash_24.png" />
+                            <img src={trashImage} />
                         </span>
                     </li>
                 )) : <p>Your cart is empty.</p>}

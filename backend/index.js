@@ -25,7 +25,18 @@ const csrfProtection = require('./csrfConfig');
 //     cert: fs.readFileSync(path.join(__dirname, 'certs', 'myapp.local.pem'))
 // };
 
-app.use(helmet());
+app.use(
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: ["'self'", "https://js.stripe.com"],
+          imgSrc: ["'self'", "data:", "https://static-assets.codecademy.com"],
+          connectSrc: ["'self'", "https://ecommerce-full-stack-back.onrender.com"],
+        },
+      },
+    })
+);
 
 app.use(cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:5173',

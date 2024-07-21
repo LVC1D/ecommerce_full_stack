@@ -162,6 +162,7 @@ authRouter.post('/register', csrfProtection, [
             }
             return res.status(201).json(newUser);
         });
+        
     } catch (error) {
         next(error);
     }

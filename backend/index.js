@@ -25,18 +25,21 @@ const sslOptions = {
     cert: fs.readFileSync(path.join(__dirname, 'certs', 'myapp.local.pem'))
 };
 
+app.use(helmet());
+
 app.use(cors({
     origin: 'https://localhost:5173',
     credentials: true
 }));
 
+app.use(morgan("dev"));
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(partials());
 
 app.use(express.static(path.join(__dirname, '..', 'frontend')));
-app.use(morgan("dev"));
-app.use(helmet());
+app.use(partials());
+
 app.use(flash());
 
 // initialized AFTER the body-parsing, cors-ing and json-ifying middleware

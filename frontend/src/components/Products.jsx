@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import {useDispatch, useSelector} from "react-redux";
 import { fetchProducts, selectProducts, selectError } from "../features/productSlice";
-import { addToCart, fetchCartByIds } from "../features/cartSlice";
+import { addToCart, fetchCartByIds, createCart } from "../features/cartSlice";
 import { selectSearchTerm } from "../features/searchSlice";
 import { Link } from "react-router-dom";
 import ROUTES from "../routes";
@@ -20,16 +20,11 @@ function Products() {
   }, [dispatch, searchTerm]);
 
   const handleAddToCart = async (productId) => {
-    const product = products.find(product => product.id === productId);
-    if (product.quantity === 0) {
-      return <p>Out of stock!</p>;
-    }
-    
     try {
       if (user && isAuth) {
         await dispatch(addToCart({ cartId: cart.id, productId })).unwrap();
         await dispatch(fetchCartByIds(user.id)).unwrap();
-        console.log("Item added for the user:", user.id, "and cart:", cart.id)
+        // console.log("Item added for the user:", user.id, "and cart:", cart.id)
       }
     } catch (error) {
       console.error("Failed to add to cart:", error);
@@ -52,7 +47,7 @@ function Products() {
                 <p>${product.price}</p>
                 {product.quantity === 0 ? <p className="out">Out of stock!</p> : <p className="instock">In stock</p>}
               </Link>
-              {cart ? <button onClick={() => handleAddToCart(product.id)}>Add to Cart</button> : <button>Add to Cart</button>}
+              {cart ? <button id="add-to-cart" disabled={product.quantity === 0} onClick={() => handleAddToCart(product.id)}>Add to Cart</button> : <button>Add to Cart</button>}
           </li>
         ))}
       </ul>

@@ -1,10 +1,11 @@
-import {useEffect} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { registerUser } from '../features/authSlice';
+import { registerUser, setUser, checkLoginStatus } from '../features/authSlice';
 import { useNavigate } from 'react-router-dom';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import ROUTES from '../routes';
 import * as Yup from 'yup';
+import { createCart, fetchCartByIds } from '../features/cartSlice';
 import './Register.css';
 
 const validationSchema = Yup.object().shape({
@@ -17,8 +18,11 @@ const validationSchema = Yup.object().shape({
 
 const RegisterPage = () => {
   const dispatch = useDispatch();
-  const { isAuth, status, error } = useSelector((state) => state.auth);
+  const { isAuth, user, status, error } = useSelector((state) => state.auth);
   const navigate = useNavigate();
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
+  const registrationRef = useRef(false);
+
   const initialValues = {
     username: '',
     email: '',
@@ -27,14 +31,44 @@ const RegisterPage = () => {
     address: '',
   };
 
-  useEffect(() => {
-    if (isAuth) {
-      navigate(ROUTES.HOME);
-    }
-  }, [isAuth, navigate])
+  // useEffect(() => {
+  //   if (isAuth) {
+  //     navigate(ROUTES.HOME);
+  //   }
+  // }, [isAuth, navigate])
 
-  const handleRegister = (values) => {
-    dispatch(registerUser(values));
+  // const handleRegister = async (values) => {
+  //   await dispatch(registerUser(values)).unwrap();
+  //   await dispatch(checkLoginStatus()).unwrap();
+
+  // };
+
+  useEffect(() => {
+    const handleUserRegistration = async () => {
+      if (registrationSuccess && user && !registrationRef.current) {
+        registrationRef.current = true; // Mark the registration process as initiated
+        try {
+          await dispatch(createCart(user.id));
+          await dispatch(fetchCartByIds(user.id));
+          navigate(ROUTES.HOME);
+        } catch (error) {
+          console.error("Error creating cart or fetching cart:", error);
+          registrationRef.current = false; // Reset if there's an error
+        }
+      }
+    };
+
+    handleUserRegistration();
+  }, [registrationSuccess, user, dispatch, navigate]);
+
+  const handleRegister = async (values) => {
+    try {
+      await dispatch(registerUser(values)).unwrap();
+      await dispatch(checkLoginStatus()).unwrap();
+      setRegistrationSuccess(true);
+    } catch (error) {
+      console.error("Error during registration:", error);
+    }
   };
 
   return (

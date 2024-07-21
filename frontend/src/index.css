@@ -60,6 +60,18 @@ button {
 button:hover {
   border-color: #646cff;
 }
+
+button:disabled {
+  background-color: #8a8e9d;
+  border-color: #aaa;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+button:disabled:hover {
+  border-color: #aaa;
+}
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;

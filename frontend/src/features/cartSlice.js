@@ -24,8 +24,9 @@ export const createCart = createAsyncThunk(
     'cart/createCart',
     async (userId) => {
         try {
+            
             const response = await api.post('/cart?userId=' + userId);
-            console.log('Cart created:', response.data);
+            // console.log('Cart created:', response.data);
             return response.data;
         } catch (error) {
             console.error("Error creating cart:", error.response.data);
@@ -49,7 +50,13 @@ export const addToCart = createAsyncThunk(
 export const cartSlice = createSlice({
     name: 'cart',
     initialState,
-    reducers: {},
+    reducers: {
+        resetCart: (state) => {
+            state.cart = null;
+            state.isLoading = false;
+            state.error = null;
+        }
+    },
     extraReducers: (builder) => {
         builder
             .addCase(fetchCartByIds.pending, (state) => {
@@ -92,3 +99,4 @@ export const cartSlice = createSlice({
 });
 
 export default cartSlice.reducer;
+export const {resetCart} = cartSlice.actions;

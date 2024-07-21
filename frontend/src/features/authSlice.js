@@ -76,6 +76,7 @@ const authSlice = createSlice({
       .addCase(registerUser.pending, (state) => {
         state.status = 'loading';
         state.error = null;
+        state.isAuth = false;
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.status = 'succeeded';
@@ -90,6 +91,7 @@ const authSlice = createSlice({
       .addCase(loginUser.pending, (state) => {
         state.status = 'loading';
         state.error = null;
+        state.isAuth = false;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.status = 'succeeded';

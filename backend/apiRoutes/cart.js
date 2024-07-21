@@ -255,8 +255,8 @@ module.exports = (pool, ensureAuthenticated, calculateSubtotal, incrementItemCou
                 payment_method_types: ['card'],
                 line_items: lineItems,
                 mode: 'payment',
-                success_url: "https://localhost:5173/success",
-                cancel_url: "https://localhost:5173/cancel",
+                success_url: `${process.env.FRONTEND_URL}/success`,
+                cancel_url: `${process.env.FRONTEND_URL}/cancel`,
             });
             res.status(201).json({ id: session.id });
         })

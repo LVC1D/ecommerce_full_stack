@@ -8,6 +8,8 @@ import { useEffect, useState } from 'react';
 import UserTooltip from './UserTooltip';
 import {selectUserTooltipVisibility, toggleTooltip} from '../features/userTooltipSlice';
 import CartItems from '../pages/CartItems';
+import userLogo from '../assets/User_32.png';
+import cartLogo from '../assets/Cart_32.png';
 
 function Header() {
     const { user, isAuth } = useSelector((state) => state.auth);
@@ -67,11 +69,11 @@ function Header() {
                     >
                     </UserTooltip>
                     <Link to={ROUTES.PROFILE(user?.id)}>
-                        <img src="../src/assets/User_32.png" alt="User Logo" />
+                        <img src={userLogo} alt="User Logo" />
                     </Link>
                     
                     <div className='count-container' onClick={toggleCartModal} style={{ cursor: 'pointer' }} >
-                        <span><img src="../src/assets/Cart_32.png" alt="Cart Logo" /></span>
+                        <span><img src={cartLogo} alt="Cart Logo" /></span>
                         <span id="count">{cart?.item_count || 0}</span>
                     </div>
                     {isCartModalVisible && <CartItems isVisible={isCartModalVisible} onClose={toggleCartModal} />}

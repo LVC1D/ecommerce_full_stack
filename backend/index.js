@@ -33,6 +33,7 @@ app.use(
           scriptSrc: ["'self'", "https://js.stripe.com"],
           imgSrc: ["'self'", "data:", "https://static-assets.codecademy.com"],
           connectSrc: ["'self'", "https://ecommerce-full-stack-back.onrender.com"],
+          frameSrc: ["'self'", "https://js.stripe.com"],
         },
       },
     })

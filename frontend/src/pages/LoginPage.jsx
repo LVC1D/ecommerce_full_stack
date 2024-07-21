@@ -27,11 +27,11 @@ const LoginPage = () => {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = 'https://ecommerce-full-stack-front.onrender.com/api/auth/google' || `https://localhost:5173/api/auth/google`;
+    window.location.href = 'https://ecommerce-full-stack-back.onrender.com/api/auth/google';
   };
 
   const handleFacebookLogin = () => {
-    window.location.href = 'https://ecommerce-full-stack-front.onrender.com/api/auth/facebook' || `https://localhost:5173/api/auth/facebook`;
+    window.location.href = 'https://ecommerce-full-stack-back.onrender.com/api/auth/facebook';
   };
 
   useEffect(() => {

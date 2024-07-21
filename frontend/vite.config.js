@@ -23,8 +23,8 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    rollupOptions: {
-      external: ['axios'], // Add axios here
-    },
+    // rollupOptions: {
+    //   external: ['axios'], // Add axios here
+    // },
   },
 })

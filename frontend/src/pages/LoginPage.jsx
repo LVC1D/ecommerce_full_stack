@@ -26,9 +26,9 @@ const LoginPage = () => {
     dispatch(loginUser(values));
   };
 
-  const handleGoogleLogin = () => {
-    window.location.href = 'https://ecommerce-full-stack-back.onrender.com/api/auth/google';
-  };
+  // const handleGoogleLogin = () => {
+  //   window.location.href = 'https://ecommerce-full-stack-back.onrender.com/api/auth/google';
+  // };
 
   const handleFacebookLogin = () => {
     window.location.href = 'https://ecommerce-full-stack-back.onrender.com/api/auth/facebook';
@@ -70,7 +70,7 @@ const LoginPage = () => {
               <div className='sso'>
                 <h2>Or login via SSO</h2>
                   <div className='sso-buttons'>
-                    <button type="submit" onClick={handleGoogleLogin}>
+                    <button type="submit" onClick={() => window.location.href = 'https://ecommerce-full-stack-back.onrender.com/api/auth/google'}>
                       Google
                     </button>
                     <button type="submit" onClick={handleFacebookLogin}>

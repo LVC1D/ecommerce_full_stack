@@ -255,8 +255,8 @@ module.exports = (pool, ensureAuthenticated, calculateSubtotal, incrementItemCou
                 payment_method_types: ['card'],
                 line_items: lineItems,
                 mode: 'payment',
-                success_url: `${process.env.FRONTEND_URL}/success`,
-                cancel_url: `${process.env.FRONTEND_URL}/cancel`,
+                success_url: `https://ecommerce-full-stack-back.onrender.com/success`,
+                cancel_url: `https://ecommerce-full-stack-back.onrender.com/cancel`,
             });
             res.status(201).json({ id: session.id });
         })

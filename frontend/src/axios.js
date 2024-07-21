@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: 'https://localhost:3400',
+    baseURL: 'https://ecommerce-full-stack-back.onrender.com',
     withCredentials: true // ensures the cookie is captured
 });
 

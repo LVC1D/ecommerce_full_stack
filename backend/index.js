@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const port = 3400;
+const port = process.env.PORT || 3400;
 const https = require('https');
 const fs = require('fs');
 const path = require('path');
@@ -20,15 +20,15 @@ const userRouter = require('./apiRoutes/users')(pool, ensureAuthenticated);
 const cartRouter = require('./apiRoutes/cart')(pool, ensureAuthenticated, calculateSubtotal, incrementItemCount);
 const csrfProtection = require('./csrfConfig');
 
-const sslOptions = {
-    key: fs.readFileSync(path.join(__dirname, 'certs', 'myapp.local-key.pem')),
-    cert: fs.readFileSync(path.join(__dirname, 'certs', 'myapp.local.pem'))
-};
+// const sslOptions = {
+//     key: fs.readFileSync(path.join(__dirname, 'certs', 'myapp.local-key.pem')),
+//     cert: fs.readFileSync(path.join(__dirname, 'certs', 'myapp.local.pem'))
+// };
 
 app.use(helmet());
 
 app.use(cors({
-    origin: 'https://localhost:5173',
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
     credentials: true
 }));
 
@@ -78,6 +78,10 @@ app.use((err, req, res, next) => {
     res.status(500).json({ message: "Internal Server Error" });
 });
 
-https.createServer(sslOptions, app).listen(port, () => {
-    console.log(`Server started at https://localhost:${port}`);
+// https.createServer(sslOptions, app).listen(port, () => {
+//     console.log(`Server started at https://localhost:${port}`);
+// });
+
+app.listen(port, () => {
+    console.log(`Server started at http://localhost:${port}`);
 });

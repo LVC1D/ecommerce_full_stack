@@ -36,21 +36,25 @@ function UserProfile() {
     }
     
     return (
-        <div>
-            {isLoading && <h2>Loading...</h2>}
-            {hasError && <h2>Something went wrong...</h2>}
+        <div className='profile-update-container'>
+            {isLoading && <h2 className='message'>Loading...</h2>}
+            {hasError && <h2 className='message error'>Something went wrong...</h2>}
             <div>
-                <h2>{user?.name}</h2>
-                <h3>{user?.email}</h3>
+                <div className='user-info'>
+                    <h2>{user?.name}</h2>
+                    <h3>{user?.email}</h3>
+                </div>
+                <div>
+                    <h1>Update your profile details below:</h1>
+                    <form className='profile-update-form' onSubmit={handleUpdate}>
+                        <input type='text' name='username' placeholder='Username' value={username} onChange={(e) => setUsername(e.target.value)} />
+                        <input type='text' name='address' placeholder='Address' value={address} onChange={(e) => setAddress(e.target.value)} />
+                        <button type='submit'>Update</button>
+                    </form>
+                </div>
             </div>
-            <h1>Update your profile details below:</h1>
-            <form onSubmit={handleUpdate}>
-                <input type='text' name='username' placeholder='Username' value={username} onChange={(e) => setUsername(e.target.value)} />
-                <input type='text' name='address' placeholder='Address' value={address} onChange={(e) => setAddress(e.target.value)} />
-                <button type='submit'>Update</button>
-            </form>
-            {validationError && <h2>{validationError}</h2>}
-            {isSuccess && <h2>Profile updated!</h2>}
+            {validationError && <h2 className='message error'>{validationError}</h2>}
+            {isSuccess && <h2 className='message success'>Profile updated!</h2>}
         </div>
     )
 }

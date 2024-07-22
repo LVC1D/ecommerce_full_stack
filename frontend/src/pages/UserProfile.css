@@ -1,0 +1,71 @@
+/* Container for the Profile Update component */
+.profile-update-container {
+    margin: 50px auto;
+    padding: 20px;
+    background: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    max-width: 600px;
+}
+
+/* Loading and error message styling */
+.message {
+    text-align: center;
+    font-size: 16px;
+    color: #666;
+}
+
+.message.error {
+    color: #ff4d4d;
+}
+
+.message.success {
+    color: #4caf50;
+}
+
+/* User info styling */
+.user-info {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.user-info h2, .user-info h3 {
+    margin: 5px 0;
+    color: #333;
+}
+
+/* Form styling */
+.profile-update-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.profile-update-form input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.profile-update-form button {
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    background-color: #333;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.profile-update-form button:hover {
+    background-color: #555;
+}
+
+@media (max-width: 768px) {
+    .profile-update-container {
+        margin: 20px;
+        padding: 15px;
+    }
+}

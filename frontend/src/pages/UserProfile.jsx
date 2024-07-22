@@ -1,6 +1,7 @@
 import {useDispatch, useSelector} from 'react-redux';
 import { fetchUserById, updateUser } from '../features/userSlice';
 import { useEffect, useState } from 'react';
+import './UserProfile.css';
 
 function UserProfile() {
     const dispatch = useDispatch();
